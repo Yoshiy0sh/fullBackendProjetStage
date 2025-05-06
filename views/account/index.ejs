@@ -1,0 +1,18 @@
+Index Account Page
+<% if(isLoggedIn){ %>
+    <br>
+    <label><%=email%></label>
+    <br>
+    <a href="/account/logout">Logout</a>
+    <div>
+        <h2>Edit account</h2>
+        <a href="/account/edit">Edit</a>
+
+        <h2>New loan</h2>
+        <a href="/loan/new">New</a>
+
+        <h2>My current loans demands</h2>
+        <a href="/loan/index">loans</a>
+    </div>
+
+<% } %>

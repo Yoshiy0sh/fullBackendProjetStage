@@ -1,0 +1,19 @@
+Edit page
+
+<div>
+    <h2>Account</h2>
+    <% if(successMessage){ %>
+        <div class="alert">
+            <label><%= successMessage %></label>
+        </div>
+    <% } %>
+    <form action="/account/edit?_method=PATCH" method="POST">
+        <input type="hidden" name="_csrf" value="<%=csrfToken%>">
+        <input type="email" name="email" value="<%=email%>">
+        <button type="submit">Submit</button>
+    </form>
+    <form action="/account/edit?_method=DELETE" method="POST">
+        <input type="hidden" name="_csrf" value="<%=csrfToken%>">
+        <button type="submit">Delete</button>
+    </form>
+</div>
