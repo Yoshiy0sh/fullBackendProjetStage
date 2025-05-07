@@ -3,8 +3,7 @@ const router = express.Router()
 const { checkCSRFToken } = require('../middlewares/csrf')
 const { generateCSRFToken } = require('../utils/csrf')
 const { restrict } = require('../middlewares/restriction')
-const { upload } = require('../utils/upload')
-const Document = require('../models/document')
+const Loan = require('../models/loan')
 
 router.route('/')
     .get(restrict,async (req,res) => {
@@ -13,7 +12,11 @@ router.route('/')
         try {
             console.log("On passe dans index loan")
             const email = req.session.email
-            res.render('loan/index',{email})
+            
+            const loans = await Loan.find({ user: req.session.userId})
+
+
+            res.render('loan/index',{email,loans})
         } catch (error) {
             
         }
@@ -22,50 +25,55 @@ router.route('/')
 router.route('/new')
     .get(restrict,async (req,res) => {
         const csrfToken = generateCSRFToken(req)
-        
+
         res.render('loan/new',{ csrfToken })
     })
-    .post(restrict,upload.fields([
-        { name: 'cni', maxCount: 1}, 
-        { name: 'justificatif', maxCount: 1 }
-    ]),async (req,res) => {
+    .post(restrict,checkCSRFToken,async (req,res) => {
         try {
-            const files = req.files
+            const { name, amount } = req.body
 
-            const document = new Document({
-                name: req.body.nom,
-                CNI: {
-                    data: files['cni'][0].buffer,
-                    contentType: files['cni'][0].mimetype
-                },
-                Justificatif: {
-                    data: files['justificatif'][0].buffer,
-                    contentType: files['justificatif'][0].mimetype
-                }
+            const user = req.session.userId;
+
+            const loan = new Loan({
+                user,
+                name,
+                amount
             })
 
-            await document.save()
-            res.redirect('/loan')
+            await loan.save()
+            res.status(201).redirect('/loan')
         } catch (error) {
             console.error(error)
         }
     })
 
-router.route('/download/:name')
-    .get(async (req,res) => {
-    try {
-        console.log('Download')
-        const document = await Document.findOne({ name: req.params.name })
+router.route('/:id')
+    .get(restrict,async (req,res) => {
+        try {
+            const csrfToken = generateCSRFToken(req)
 
-        res.set({
-            'Content-Type': document.CNI.contentType,
-            'Content-Disposition': `attachment; filename="${document.name}-CNI.pdf"`,
-        })
+            res.send(req.params.id)
+        } catch (error) {
+            console.error(error)
+        }
+    })
+    
 
-        res.send(document.CNI.data)
-    } catch (error) {
-        console.error(error)
-    }
-})
+// router.route('/download/:name')
+//     .get(async (req,res) => {
+//     try {
+//         console.log('Download')
+//         const document = await Document.findOne({ name: req.params.name })
+
+//         res.set({
+//             'Content-Type': document.CNI.contentType,
+//             'Content-Disposition': `attachment; filename="${document.name}-CNI.pdf"`,
+//         })
+
+//         res.send(document.CNI.data)
+//     } catch (error) {
+//         console.error(error)
+//     }
+// })
 
 module.exports = router

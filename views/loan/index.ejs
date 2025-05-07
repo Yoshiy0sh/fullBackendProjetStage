@@ -3,9 +3,14 @@ Index Loan Page
 <br>
 <h6>Hello account : <%=email%></h6>
 <br>
-
 <div>
     <label>My loans</label>
+    <ul>
+        <% loans.forEach(loan => { %>
+            <li><%= loan.name %></li>
+            <a href="/loan/<%=loan._id%>">edit</a>
+        <% }) %>
+    </ul>
     <br>
-    <a href="/loan/new">Nouvelle demande</a>
+    <a href="/loan/new">new demand</a>
 </div>

@@ -1,5 +1,5 @@
 function restrict(req,res,next){
-    if(req.session.userId){
+    if(req.session && req.session.userId){
         next()
     } else {
         console.log('Access denied')
