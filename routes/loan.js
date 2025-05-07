@@ -1,5 +1,6 @@
 const express = require('express')
 const router = express.Router()
+const mongoose = require('mongoose')
 const { checkCSRFToken } = require('../middlewares/csrf')
 const { generateCSRFToken } = require('../utils/csrf')
 const { restrict } = require('../middlewares/restriction')
@@ -51,10 +52,33 @@ router.route('/:id')
     .get(restrict,async (req,res) => {
         try {
             const csrfToken = generateCSRFToken(req)
+            const loanId = req.params.id
 
-            res.send(req.params.id)
+            const loan = await Loan.findById(loanId)
+            res.render('loan/show',{csrfToken,loanId,name: loan.name,amount: loan.amount})
         } catch (error) {
             console.error(error)
+        }
+    })
+    .patch(restrict,checkCSRFToken, async (req,res) => {
+        try {
+            if(!mongoose.Types.ObjectId.isValid(req.params.id)){
+                return res.status(400).send('Invalid loan ID')
+            }
+            const {name, amount} = req.body
+
+            const loan = await Loan.findById(req.params.id)
+
+            if(!loan){
+                return res.status(404).send('Loan not found')
+            }
+
+            loan.name = name
+            loan.amount = amount
+            await loan.save()
+            res.redirect(`/loan/${req.params.id}`)
+        } catch (error) {
+            console.log(error)
         }
     })
     

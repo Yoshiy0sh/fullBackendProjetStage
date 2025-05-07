@@ -82,6 +82,7 @@ router.route('/login')
             }
 
             const user = await User.findOne({email:email})
+            
             if(!user){
                 req.session.formData = {email,password}
                 req.session.error = 'User not found'
@@ -95,12 +96,17 @@ router.route('/login')
                 return res.status(401).redirect('login')
             }
 
-            //il faudrait faire un req.session.regenerate mais je veux voir
-            //ce que ça fait sans avant
-            req.session.userId = user._id
-            req.session.email = user.email
+            req.session.regenerate((err) => {
+                if(err){
+                    console.error('Error regenerating session',err)
+                    return res.status(500).send('Internal server error')
+                }
 
-            res.redirect('/account')
+                req.session.userId = user._id
+                req.session.email = user.email
+
+                res.redirect('/account')
+            })
         } catch (error) {
             console.error(error)
             res.status(500).json({message: 'Server Error'})
