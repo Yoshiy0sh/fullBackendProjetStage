@@ -1,5 +1,11 @@
 Edit page
 
+<% if (error){ %>
+    <div>
+        <label><%= error %></label>
+    </div>
+<% } %>
+
 <div>
     <h2>Account</h2>
     <% if(successMessage){ %>

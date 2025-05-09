@@ -4,6 +4,7 @@ const router = express.Router()
 const { checkCSRFToken } = require('../middlewares/csrf')
 const { generateCSRFToken } = require('../utils/csrf')
 const { restrict } = require('../middlewares/restriction')
+const { checkExistenceFields } = require('../utils/validateFields') 
 
 const User = require('../models/user')
 
@@ -27,12 +28,20 @@ router.route('/register')
     })
     .post(checkCSRFToken,async (req,res) => {
         try {
-            const {email, password} = req.body
-            if(!email || !password){
-                req.session.formData = {email,password}
-                req.session.error = 'All fields are required'
-                return res.status(400).redirect('register')
+            console.log(req.body.email)
+
+            const fields = checkExistenceFields(req,res,['email','password'])
+            // if(!email || !password){
+            //     req.session.formData = {email,password}
+            //     req.session.error = 'All fields are required'
+            //     return res.status(400).redirect('register')
+            // }
+
+            if(!fields){
+                return
             }
+
+            const {email,password} = fields
 
             //is email unique ?
             const existingUser = await User.findOne({email : email})
@@ -73,16 +82,26 @@ router.route('/login')
     })
     .post(checkCSRFToken,async (req,res) => {
         try {
-            const {email, password} = req.body
+            // checkFields(fields = req.body)
+
+            // const {email, password} = req.body
             
-            if(!email || !password){
-                req.session.formData = {email,password}
-                req.session.error = 'All fields are required'
-                return res.status(400).redirect('login')
+            // if(!email || !password){
+            //     req.session.formData = {email,password}
+            //     req.session.error = 'All fields are required'
+            //     return res.status(400).redirect('login')
+            // }
+
+            const fields = checkExistenceFields(req,res,['email','password'])
+
+            if(!fields){
+                return
             }
 
+            const {email, password} = fields
+
             const user = await User.findOne({email:email})
-            
+
             if(!user){
                 req.session.formData = {email,password}
                 req.session.error = 'User not found'
@@ -127,13 +146,37 @@ router.route('/edit')
         email = req.session.email
         const successMessage = req.session.successMessage
         delete req.session.successMessage
-        res.render('account/edit',{email , successMessage,csrfToken})
+        const error = req.session.error
+        delete req.session.error
+        res.render('account/edit',{ error,email,successMessage,csrfToken })
     })
     .patch(checkCSRFToken,restrict,async (req,res) => {
         try {
+            const fields = checkExistenceFields(req,res,['email'])
+            if(!fields){
+                return
+            }
+            const { email } = fields
+
             const user = await User.findById(req.session.userId)
-            user.email = req.body.email
-            req.session.email = req.body.email
+            //do not patch email if same as in use
+
+            if(email === user.email){
+                req.session.error = 'Email already in use by your account'
+                return res.status(409).redirect('edit')
+            }
+
+
+            //do not patch email if already in use
+
+            const existingUser = await User.findOne({ email:email })
+            if(existingUser){
+                req.session.error = 'Email already in use by another account'
+                return res.status(409).redirect('edit')
+            }
+
+            user.email = email
+            req.session.email = email
             req.session.successMessage = "Informations successfully updated"
 
             await user.save()

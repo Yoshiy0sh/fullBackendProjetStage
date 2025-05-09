@@ -6,8 +6,10 @@ const { generateCSRFToken } = require('../utils/csrf')
 const { restrict } = require('../middlewares/restriction')
 const Loan = require('../models/loan')
 
+router.use(restrict)
+
 router.route('/')
-    .get(restrict,async (req,res) => {
+    .get(async (req,res) => {
         //il faut faire la vérification du logged in directement dans la route et non dans ejs
         //avec un paramètre isLoggedIn
         try {
@@ -24,12 +26,12 @@ router.route('/')
     })
 
 router.route('/new')
-    .get(restrict,async (req,res) => {
+    .get(async (req,res) => {
         const csrfToken = generateCSRFToken(req)
 
         res.render('loan/new',{ csrfToken })
     })
-    .post(restrict,checkCSRFToken,async (req,res) => {
+    .post(checkCSRFToken,async (req,res) => {
         try {
             const { name, amount } = req.body
 
@@ -49,7 +51,7 @@ router.route('/new')
     })
 
 router.route('/:id')
-    .get(restrict,async (req,res) => {
+    .get(async (req,res) => {
         try {
             const csrfToken = generateCSRFToken(req)
             const loanId = req.params.id
@@ -60,23 +62,32 @@ router.route('/:id')
             console.error(error)
         }
     })
-    .patch(restrict,checkCSRFToken, async (req,res) => {
+    .patch(checkCSRFToken, async (req,res) => {
         try {
             if(!mongoose.Types.ObjectId.isValid(req.params.id)){
                 return res.status(400).send('Invalid loan ID')
             }
             const {name, amount} = req.body
 
-            const loan = await Loan.findById(req.params.id)
+            const loan = await Loan.findByIdAndUpdate(
+                {_id:req.params.id},
+                {name,amount},
+                {new: true, runValidators: true}
+            )
 
             if(!loan){
                 return res.status(404).send('Loan not found')
             }
 
-            loan.name = name
-            loan.amount = amount
-            await loan.save()
             res.redirect(`/loan/${req.params.id}`)
+        } catch (error) {
+            console.log(error)
+        }
+    })
+    .delete(checkCSRFToken, async (req,res) => {
+        try {
+            await Loan.findByIdAndDelete(req.params.id)
+            res.status(200).redirect('/loan')
         } catch (error) {
             console.log(error)
         }
