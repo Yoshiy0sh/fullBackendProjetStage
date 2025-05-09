@@ -75,23 +75,13 @@ router.route('/login')
         const csrfToken = generateCSRFToken(req)
 
         const {email,password} = req.session.formData || {email: '',password: ''}
-        req.session.formData = null
+        delete req.session.formData
         const error = req.session.error
-        req.session.error = null
+        delete req.session.error
         res.render('account/login',{email,password,error,csrfToken})
     })
     .post(checkCSRFToken,async (req,res) => {
         try {
-            // checkFields(fields = req.body)
-
-            // const {email, password} = req.body
-            
-            // if(!email || !password){
-            //     req.session.formData = {email,password}
-            //     req.session.error = 'All fields are required'
-            //     return res.status(400).redirect('login')
-            // }
-
             const fields = checkExistenceFields(req,res,['email','password'])
 
             if(!fields){

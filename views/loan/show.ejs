@@ -1,5 +1,11 @@
 show page loan
 
+<% if (error){ %>
+    <div>
+        <label><%= error %></label>
+    </div>
+  <% } %>
+
 <div>
     <form action="/loan/<%=loanId%>?_method=PATCH" method="POST">
         <input type="hidden" name="_csrf" value="<%=csrfToken%>">

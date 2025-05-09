@@ -1,14 +1,21 @@
 <body>
   <h1>Create loan</h1>
 
+  <% if (error){ %>
+    <div>
+        <label><%= error %></label>
+    </div>
+  <% } %>
+
+
   <form action="/loan/new" method="POST">
     <input type="hidden" name="_csrf" value="<%=csrfToken%>">
 
     <label>Name :</label><br>
-    <input type="text" name="name" required><br><br>
+    <input type="text" name="name" value="<%=name%>"><br><br>
 
     <label>Amount :</label><br>
-    <input type="number" name="amount" required><br><br>
+    <input type="number" name="amount" value="<%=amount%>"><br><br>
 
     <button type="submit">Envoyer</button>
   </form>

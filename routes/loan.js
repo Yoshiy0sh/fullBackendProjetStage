@@ -5,6 +5,7 @@ const { checkCSRFToken } = require('../middlewares/csrf')
 const { generateCSRFToken } = require('../utils/csrf')
 const { restrict } = require('../middlewares/restriction')
 const Loan = require('../models/loan')
+const { checkExistenceFields } = require('../utils/validateFields')
 
 router.use(restrict)
 
@@ -26,14 +27,24 @@ router.route('/')
     })
 
 router.route('/new')
-    .get(async (req,res) => {
+    .get((req,res) => {
         const csrfToken = generateCSRFToken(req)
 
-        res.render('loan/new',{ csrfToken })
+        const error = req.session.error
+        delete req.session.error
+
+        const { name,amount } = req.session.formData || { name: '', amount: ''}
+        delete req.session.formData
+
+        res.render('loan/new',{ error,csrfToken,name,amount })
     })
     .post(checkCSRFToken,async (req,res) => {
         try {
-            const { name, amount } = req.body
+            const fields = checkExistenceFields(req,res,['name','amount'])
+            if(!fields){
+                return
+            }
+            const { name, amount } = fields
 
             const user = req.session.userId;
 
@@ -57,7 +68,11 @@ router.route('/:id')
             const loanId = req.params.id
 
             const loan = await Loan.findById(loanId)
-            res.render('loan/show',{csrfToken,loanId,name: loan.name,amount: loan.amount})
+
+            const error = req.session.error
+            delete req.session.error
+
+            res.render('loan/show',{error,csrfToken,loanId,name: loan.name,amount: loan.amount})
         } catch (error) {
             console.error(error)
         }
@@ -67,7 +82,12 @@ router.route('/:id')
             if(!mongoose.Types.ObjectId.isValid(req.params.id)){
                 return res.status(400).send('Invalid loan ID')
             }
-            const {name, amount} = req.body
+
+            const fields = checkExistenceFields(req,res,['name','amount'])
+            if(!fields){
+                return
+            }
+            const {name, amount} = fields
 
             const loan = await Loan.findByIdAndUpdate(
                 {_id:req.params.id},
