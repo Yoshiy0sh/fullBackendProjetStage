@@ -10,5 +10,10 @@ Register Page
     <input type="hidden" name="_csrf" value="<%=csrfToken%>">
     <input type="email" name="email" value="<%=email%>">
     <input type="password" name="password" value="<%=password%>">
+    <select name="usertype">
+        <option value="applicant">Applicant</option>
+        <option value="loanOfficer">Loan Officer</option>
+        <option value="admin">Admin</option>
+    </select>
     <button type="submit">Register</button>
 </form>

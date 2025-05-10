@@ -3,11 +3,11 @@ const router = express.Router()
 const mongoose = require('mongoose')
 const { checkCSRFToken } = require('../middlewares/csrf')
 const { generateCSRFToken } = require('../utils/csrf')
-const { restrict } = require('../middlewares/restriction')
+const { restrictConnected } = require('../middlewares/restriction')
 const Loan = require('../models/loan')
 const { checkExistenceFields } = require('../utils/validateFields')
 
-router.use(restrict)
+router.use(restrictConnected)
 
 router.route('/')
     .get(async (req,res) => {
@@ -71,6 +71,8 @@ router.route('/:id')
 
             const error = req.session.error
             delete req.session.error
+
+            delete req.session.formData
 
             res.render('loan/show',{error,csrfToken,loanId,name: loan.name,amount: loan.amount})
         } catch (error) {

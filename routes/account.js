@@ -3,14 +3,14 @@ const bcrypt = require('bcryptjs')
 const router = express.Router()
 const { checkCSRFToken } = require('../middlewares/csrf')
 const { generateCSRFToken } = require('../utils/csrf')
-const { restrict } = require('../middlewares/restriction')
+const { restrictConnected } = require('../middlewares/restriction')
 const { checkExistenceFields } = require('../utils/validateFields') 
 
 const User = require('../models/user')
 
 router.route('/')
     .get((req,res) => {
-        //add message "complete profile if unfinished"
+        //add message "complete profile if uncompleted"
         const isLoggedIn = req.session.userId != null
         const email = req.session.email ? req.session.email : null
         res.render('account/index',{isLoggedIn: isLoggedIn ,email: email}) 
@@ -20,7 +20,7 @@ router.route('/register')
     .get((req,res) => {
         const csrfToken = generateCSRFToken(req)
 
-        const {email,password,errors} = req.session.formData || {email: '',password: ''}
+        const {email,password,usertype} = req.session.formData || {email: '',password: '',usertype: ''}
         req.session.formData = null
         const error = req.session.error
         req.session.error = null
@@ -28,25 +28,16 @@ router.route('/register')
     })
     .post(checkCSRFToken,async (req,res) => {
         try {
-            console.log(req.body.email)
-
-            const fields = checkExistenceFields(req,res,['email','password'])
-            // if(!email || !password){
-            //     req.session.formData = {email,password}
-            //     req.session.error = 'All fields are required'
-            //     return res.status(400).redirect('register')
-            // }
-
+            const fields = checkExistenceFields(req,res,['email','password','usertype'])
             if(!fields){
                 return
             }
-
-            const {email,password} = fields
+            const {email,password,usertype} = fields
 
             //is email unique ?
             const existingUser = await User.findOne({email : email})
             if(existingUser){
-                req.session.formData = {email,password}
+                req.session.formData = {email,password,usertype}
                 req.session.error = 'Email already in use'
                 return res.status(409).redirect('register')
             }
@@ -59,11 +50,14 @@ router.route('/register')
             const newUser = new User({
                 email: email,
                 password: hash,
-                usertype: 'applicant'
+                usertype: usertype
             })
 
             await newUser.save()
             console.log('New user : ', newUser)
+
+            // modelGeneratorUsertype(usertype,newUser._id)
+
             res.status(201).redirect('login')
         } catch (error) {
             console.error(error)
@@ -130,7 +124,7 @@ router.route('/logout')
     })
 
 router.route('/edit')
-    .get(restrict,(req,res) => {
+    .get(restrictConnected,(req,res) => {
         csrfToken = generateCSRFToken(req)
 
         email = req.session.email
@@ -140,7 +134,7 @@ router.route('/edit')
         delete req.session.error
         res.render('account/edit',{ error,email,successMessage,csrfToken })
     })
-    .patch(checkCSRFToken,restrict,async (req,res) => {
+    .patch(checkCSRFToken,restrictConnected,async (req,res) => {
         try {
             const fields = checkExistenceFields(req,res,['email'])
             if(!fields){
@@ -176,7 +170,7 @@ router.route('/edit')
             console.error(error)
         }
     })
-    .delete(checkCSRFToken,restrict,async (req,res) => {
+    .delete(checkCSRFToken,restrictConnected,async (req,res) => {
         try {
             await User.findOneAndDelete({ _id: req.session.userId })
             res.status(200).redirect('logout')
@@ -185,5 +179,18 @@ router.route('/edit')
             res.status(500)
         }
     })
+
+async function modelGeneratorUsertype(usertype,userId){
+    if(usertype == 'applicant'){
+        const newApplicant = new Applicant({ user: userId })
+        await newApplicant.save()
+        return newApplicant
+    } else if(usertype == 'loanOfficer'){
+        return null
+    }
+    else{
+        return null
+    }
+}
 
 module.exports = router

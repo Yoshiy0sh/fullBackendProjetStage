@@ -44,7 +44,11 @@ app.use(session({
     }
 }))
 
+app.get('/',(req,res) =>{
+    res.redirect('/account')
+})
+
 app.use('/account',accountRouter)
-app.use('/loan',loanRouter) 
+app.use('/loan',loanRouter)
 
 app.listen(3000,() => {console.log('Listening on port 3000')})
