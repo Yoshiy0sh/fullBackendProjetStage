@@ -6,19 +6,23 @@ Edit page
     </div>
 <% } %>
 
-<div>
-    <h2>Account</h2>
-    <% if(successMessage){ %>
+<% if(successMessage){ %>
         <div class="alert">
             <label><%= successMessage %></label>
         </div>
     <% } %>
-    <form action="/account/edit?_method=PATCH" method="POST">
+
+<div>
+    <h2>Edit User</h2>
+    <form action="edit?_method=PATCH" method="POST" enctype="multipart/form-data">
         <input type="hidden" name="_csrf" value="<%=csrfToken%>">
         <input type="email" name="email" value="<%=email%>">
+        <br>
+        <input type="text" name="name" value="<%=name%>">
+        <input type="file" name="CNI">
         <button type="submit">Submit</button>
     </form>
-    <form action="/account/edit?_method=DELETE" method="POST">
+    <form action="edit?_method=DELETE" method="POST">
         <input type="hidden" name="_csrf" value="<%=csrfToken%>">
         <button type="submit">Delete</button>
     </form>

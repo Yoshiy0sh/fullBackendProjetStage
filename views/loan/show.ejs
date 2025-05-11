@@ -7,13 +7,13 @@ show page loan
   <% } %>
 
 <div>
-    <form action="/loan/<%=loanId%>?_method=PATCH" method="POST">
+    <form action="<%=loanId%>?_method=PATCH" method="POST">
         <input type="hidden" name="_csrf" value="<%=csrfToken%>">
         <input type="text" name="name" value="<%=name%>">
         <input type="number" name="amount" value="<%=amount%>">
         <button type="submit">Modify</button>
     </form>
-    <form action="/loan/<%=loanId%>?_method=DELETE" method="POST">
+    <form action="<%=loanId%>?_method=DELETE" method="POST">
         <input type="hidden" name="_csrf" value="<%=csrfToken%>">
         <button type="submit">Delete</button>
     </form>

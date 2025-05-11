@@ -6,8 +6,9 @@ const express = require('express')
 const path = require('path')
 const session = require('express-session')
 const mongoStore = require('connect-mongo')
-const accountRouter = require('./routes/account')
-const loanRouter = require('./routes/loan')
+// const accountRouter = require('./routes/account')
+// const loanRouter = require('./routes/loan')
+const indexRouter = require('./routes/index')
 const methodOverride = require('method-override')
 
 const app = express()
@@ -44,11 +45,8 @@ app.use(session({
     }
 }))
 
-app.get('/',(req,res) =>{
-    res.redirect('/account')
-})
-
-app.use('/account',accountRouter)
-app.use('/loan',loanRouter)
+app.use('/',indexRouter)
+// app.use('/account',accountRouter)
+// app.use('/loan',loanRouter)
 
 app.listen(3000,() => {console.log('Listening on port 3000')})

@@ -1,16 +1,17 @@
 const express = require('express')
 const bcrypt = require('bcryptjs')
 const router = express.Router()
-const { checkCSRFToken } = require('../middlewares/csrf')
-const { generateCSRFToken } = require('../utils/csrf')
-const { restrictConnected } = require('../middlewares/restriction')
-const { checkExistenceFields } = require('../utils/validateFields') 
+const { checkCSRFToken } = require('../../middlewares/csrf')
+const { generateCSRFToken } = require('../../utils/csrf')
+const { restrictConnected } = require('../../middlewares/restriction')
+const { checkExistenceFields } = require('../../utils/validateFields') 
+const upload = require('../../utils/upload')
 
 //import from models
 
-const Applicant = require('../models/applicant')
+const Applicant = require('../../models/applicant')
 
-const User = require('../models/user')
+const User = require('../../models/user')
 
 router.route('/')
     .get((req,res) => {
@@ -119,13 +120,7 @@ router.route('/login')
             res.status(500).json({message: 'Server Error'})
         }
     })
-    
-router.route('/logout')
-    .get((req,res) => {
-        req.session.destroy(() => {
-            res.redirect('/account')
-        })
-    })
+
 
 router.route('/edit')
     .get(restrictConnected,(req,res) => {
@@ -136,38 +131,57 @@ router.route('/edit')
         delete req.session.successMessage
         const error = req.session.error
         delete req.session.error
-        res.render('account/edit',{ error,email,successMessage,csrfToken })
+
+        const name = null
+        
+        res.render('account/edit',{ error,email,successMessage,csrfToken,name })
     })
-    .patch(checkCSRFToken,restrictConnected,async (req,res) => {
+    .patch(upload.single('CNI'),checkCSRFToken,restrictConnected,async (req,res) => {
         try {
-            const fields = checkExistenceFields(req,res,['email'])
-            if(!fields){
+            const UserFields = checkExistenceFields(req,res,['email'])
+            if(!UserFields){
                 return
             }
-            const { email } = fields
+            const { email } = UserFields
 
             const user = await User.findById(req.session.userId)
             //do not patch email if same as in use
 
-            if(email === user.email){
-                req.session.error = 'Email already in use by your account'
-                return res.status(409).redirect('edit')
-            }
-
+            // if(email === user.email){
+            //     req.session.error = 'Email already in use by your account'
+            //     return res.status(409).redirect('edit')
+            // }
 
             //do not patch email if already in use
 
-            const existingUser = await User.findOne({ email:email })
-            if(existingUser){
-                req.session.error = 'Email already in use by another account'
-                return res.status(409).redirect('edit')
-            }
+            // const existingUser = await User.findOne({ email:email })
+            // if(existingUser){
+            //     req.session.error = 'Email already in use by another account'
+            //     return res.status(409).redirect('edit')
+            // }
 
             user.email = email
             req.session.email = email
             req.session.successMessage = "Informations successfully updated"
 
             await user.save()
+
+            //Applicant part
+
+            const ApplicantFields = checkExistenceFields(req,res,['name'])
+            if(!ApplicantFields){
+                return
+            }
+            const { name } = ApplicantFields
+
+            const applicant = await Applicant.findOne({ user: req.session.userId })
+            applicant.name = name
+            applicant.CNI = {
+                data: req.file.buffer,
+                contentType: req.file.mimetype
+            }
+
+            await applicant.save()
 
             res.status(200).redirect('edit')
         } catch (error) {

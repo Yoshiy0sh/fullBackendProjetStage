@@ -1,11 +1,11 @@
 const express = require('express')
 const router = express.Router()
 const mongoose = require('mongoose')
-const { checkCSRFToken } = require('../middlewares/csrf')
-const { generateCSRFToken } = require('../utils/csrf')
-const { restrictConnected } = require('../middlewares/restriction')
-const Loan = require('../models/loan')
-const { checkExistenceFields } = require('../utils/validateFields')
+const { checkCSRFToken } = require('../../middlewares/csrf')
+const { generateCSRFToken } = require('../../utils/csrf')
+const { restrictConnected } = require('../../middlewares/restriction')
+const Loan = require('../../models/loan')
+const { checkExistenceFields } = require('../../utils/validateFields')
 
 router.use(restrictConnected)
 
@@ -55,7 +55,7 @@ router.route('/new')
             })
 
             await loan.save()
-            res.status(201).redirect('/loan')
+            res.status(201).redirect('/applicant/loan')
         } catch (error) {
             console.error(error)
         }
@@ -101,7 +101,7 @@ router.route('/:id')
                 return res.status(404).send('Loan not found')
             }
 
-            res.redirect(`/loan/${req.params.id}`)
+            res.redirect(`${req.params.id}`)
         } catch (error) {
             console.log(error)
         }
@@ -109,7 +109,7 @@ router.route('/:id')
     .delete(checkCSRFToken, async (req,res) => {
         try {
             await Loan.findByIdAndDelete(req.params.id)
-            res.status(200).redirect('/loan')
+            res.status(200).redirect('account/loan')
         } catch (error) {
             console.log(error)
         }

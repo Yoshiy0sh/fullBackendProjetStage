@@ -8,9 +8,9 @@ Index Loan Page
     <ul>
         <% loans.forEach(loan => { %>
             <li><%= loan.name %></li>
-            <a href="/loan/<%=loan._id%>">edit</a>
+            <a href="loan/<%=loan._id%>">edit</a>
         <% }) %>
     </ul>
     <br>
-    <a href="/loan/new">new demand</a>
+    <a href="loan/new">new demand</a>
 </div>

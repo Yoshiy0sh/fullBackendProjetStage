@@ -8,7 +8,7 @@ const applicantSchema = new mongoose.Schema({
             type: String,
         },
         CNI: {
-            type: Buffer,
+            data: Buffer,
             contentType: String,
         },
         user: {
