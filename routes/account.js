@@ -6,6 +6,10 @@ const { generateCSRFToken } = require('../utils/csrf')
 const { restrictConnected } = require('../middlewares/restriction')
 const { checkExistenceFields } = require('../utils/validateFields') 
 
+//import from models
+
+const Applicant = require('../models/applicant')
+
 const User = require('../models/user')
 
 router.route('/')
@@ -56,7 +60,7 @@ router.route('/register')
             await newUser.save()
             console.log('New user : ', newUser)
 
-            // modelGeneratorUsertype(usertype,newUser._id)
+            modelGeneratorUsertype(usertype,newUser._id)
 
             res.status(201).redirect('login')
         } catch (error) {
