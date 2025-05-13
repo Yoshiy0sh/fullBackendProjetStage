@@ -3,14 +3,12 @@ const bcrypt = require('bcryptjs')
 const router = express.Router()
 const { checkCSRFToken } = require('../../middlewares/csrf')
 const { generateCSRFToken } = require('../../utils/csrf')
-const { restrictConnected } = require('../../middlewares/restriction')
-const { checkExistenceFields } = require('../../utils/validateFields') 
+const { checkExistenceFields } = require('../../utils/validateFields')
 const upload = require('../../utils/upload')
 
 //import from models
 
 const Applicant = require('../../models/applicant')
-
 const User = require('../../models/user')
 
 router.route('/')
@@ -18,7 +16,7 @@ router.route('/')
         //add message "complete profile if uncompleted"
         const isLoggedIn = req.session.userId != null
         const email = req.session.email ? req.session.email : null
-        res.render('account/index',{isLoggedIn: isLoggedIn ,email: email}) 
+        res.render('applicant/account/index',{isLoggedIn: isLoggedIn ,email: email}) 
     })
 
 router.route('/register')
@@ -29,7 +27,7 @@ router.route('/register')
         req.session.formData = null
         const error = req.session.error
         req.session.error = null
-        res.render('account/register',{email,password,error,csrfToken})
+        res.render('applicant/account/register',{email,password,error,csrfToken})
     })
     .post(checkCSRFToken,async (req,res) => {
         try {
@@ -77,7 +75,7 @@ router.route('/login')
         delete req.session.formData
         const error = req.session.error
         delete req.session.error
-        res.render('account/login',{email,password,error,csrfToken})
+        res.render('applicant/account/login',{email,password,error,csrfToken})
     })
     .post(checkCSRFToken,async (req,res) => {
         try {
@@ -123,7 +121,7 @@ router.route('/login')
 
 
 router.route('/edit')
-    .get(restrictConnected,(req,res) => {
+    .get((req,res) => {
         csrfToken = generateCSRFToken(req)
 
         email = req.session.email
@@ -134,47 +132,17 @@ router.route('/edit')
 
         const name = null
         
-        res.render('account/edit',{ error,email,successMessage,csrfToken,name })
+        res.render('applicant/account/edit',{ error,email,successMessage,csrfToken,name })
     })
-    .patch(upload.single('CNI'),checkCSRFToken,restrictConnected,async (req,res) => {
+    .patch(upload.single('CNI'),checkCSRFToken,async (req,res) => {
         try {
-            const UserFields = checkExistenceFields(req,res,['email'])
-            if(!UserFields){
-                return
-            }
-            const { email } = UserFields
-
-            const user = await User.findById(req.session.userId)
-            //do not patch email if same as in use
-
-            // if(email === user.email){
-            //     req.session.error = 'Email already in use by your account'
-            //     return res.status(409).redirect('edit')
-            // }
-
-            //do not patch email if already in use
-
-            // const existingUser = await User.findOne({ email:email })
-            // if(existingUser){
-            //     req.session.error = 'Email already in use by another account'
-            //     return res.status(409).redirect('edit')
-            // }
-
-            user.email = email
-            req.session.email = email
-            req.session.successMessage = "Informations successfully updated"
-
-            await user.save()
-
-            //Applicant part
-
             const ApplicantFields = checkExistenceFields(req,res,['name'])
             if(!ApplicantFields){
                 return
             }
             const { name } = ApplicantFields
 
-            const applicant = await Applicant.findOne({ user: req.session.userId })
+            const applicant = await Applicant.findOne({ user: req.session.user._id })
             applicant.name = name
             applicant.CNI = {
                 data: req.file.buffer,
@@ -188,7 +156,7 @@ router.route('/edit')
             console.error(error)
         }
     })
-    .delete(checkCSRFToken,restrictConnected,async (req,res) => {
+    .delete(checkCSRFToken,async (req,res) => {
         try {
             await User.findOneAndDelete({ _id: req.session.userId })
             res.status(200).redirect('logout')

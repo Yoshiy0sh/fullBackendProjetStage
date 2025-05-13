@@ -2,7 +2,7 @@ const User = require('../models/user')
 
 async function restrictApplicant(req,res,next){
     try {
-        if(req.session && req.session.userId){
+        if(req.session && req.session.user){
             if(req.session.user.usertype == 'applicant'){
                 return next()
             }
@@ -18,7 +18,7 @@ async function restrictApplicant(req,res,next){
 
 function restrictConnected(req,res,next){
     try {
-        if(req.session && req.session.userId){
+        if(req.session && req.session.user){
             next()
         } else {
             console.log('Access denied')

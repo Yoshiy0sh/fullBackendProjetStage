@@ -20,7 +20,7 @@ router.route('/')
             const loans = await Loan.find({ user: req.session.userId})
 
 
-            res.render('loan/index',{email,loans})
+            res.render('applicant/loan/index',{email,loans})
         } catch (error) {
             
         }
@@ -36,7 +36,7 @@ router.route('/new')
         const { name,amount } = req.session.formData || { name: '', amount: ''}
         delete req.session.formData
 
-        res.render('loan/new',{ error,csrfToken,name,amount })
+        res.render('applicant/loan/new',{ error,csrfToken,name,amount })
     })
     .post(checkCSRFToken,async (req,res) => {
         try {
@@ -74,7 +74,7 @@ router.route('/:id')
 
             delete req.session.formData
 
-            res.render('loan/show',{error,csrfToken,loanId,name: loan.name,amount: loan.amount})
+            res.render('applicant/loan/show',{error,csrfToken,loanId,name: loan.name,amount: loan.amount})
         } catch (error) {
             console.error(error)
         }

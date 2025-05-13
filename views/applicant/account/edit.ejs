@@ -14,10 +14,9 @@ Edit page
 
 <div>
     <h2>Edit User</h2>
+    <a href="/edit">Modifier les informations personelles</a>
     <form action="edit?_method=PATCH" method="POST" enctype="multipart/form-data">
         <input type="hidden" name="_csrf" value="<%=csrfToken%>">
-        <input type="email" name="email" value="<%=email%>">
-        <br>
         <input type="text" name="name" value="<%=name%>">
         <input type="file" name="CNI">
         <button type="submit">Submit</button>

@@ -12,8 +12,10 @@ const accountRouter = require('./account')
 
 const User = require('../../models/user')
 
+router.use(restrictApplicant)
+
 router.route('/')
-    .get(restrictApplicant,(req,res) => {
+    .get((req,res) => {
         res.redirect('/applicant/account')
     })
 
