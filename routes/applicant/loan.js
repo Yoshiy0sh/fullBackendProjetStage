@@ -1,8 +1,8 @@
 const express = require('express')
 const router = express.Router()
 const mongoose = require('mongoose')
-const { checkCSRFToken } = require('../../middlewares/csrf')
-const { generateCSRFToken } = require('../../utils/csrf')
+// const { checkCSRFToken } = require('../../middlewares/csrf')
+// const { generateCSRFToken } = require('../../utils/csrf')
 const { restrictConnected } = require('../../middlewares/restriction')
 const Loan = require('../../models/loan')
 const { checkExistenceFields } = require('../../utils/validateFields')
@@ -14,13 +14,11 @@ router.route('/')
         //il faut faire la vérification du logged in directement dans la route et non dans ejs
         //avec un paramètre isLoggedIn
         try {
-            console.log("On passe dans index loan")
-            const email = req.session.email
+            const email = req.session.user.email
+            // const errorMessage = req.session.errorMessage ? req.session.errorMessage : null
             
-            const loans = await Loan.find({ user: req.session.userId})
-
-
-            res.render('applicant/loan/index',{email,loans})
+            const loans = await Loan.find({ user: req.session.user._id})
+            res.render('applicant/loan/index',{email,loans,errorMessage : 'nullos on a rien trouvé'})
         } catch (error) {
             
         }
@@ -28,7 +26,7 @@ router.route('/')
 
 router.route('/new')
     .get((req,res) => {
-        const csrfToken = generateCSRFToken(req)
+        // const csrfToken = generateCSRFToken(req)
 
         const error = req.session.error
         delete req.session.error
@@ -36,9 +34,9 @@ router.route('/new')
         const { name,amount } = req.session.formData || { name: '', amount: ''}
         delete req.session.formData
 
-        res.render('applicant/loan/new',{ error,csrfToken,name,amount })
+        res.render('applicant/loan/new',{ error,name,amount })
     })
-    .post(checkCSRFToken,async (req,res) => {
+    .post(async (req,res) => {
         try {
             const fields = checkExistenceFields(req,res,['name','amount'])
             if(!fields){
@@ -46,7 +44,7 @@ router.route('/new')
             }
             const { name, amount } = fields
 
-            const user = req.session.userId;
+            const user = req.session.user._id;
 
             const loan = new Loan({
                 user,
@@ -64,7 +62,7 @@ router.route('/new')
 router.route('/:id')
     .get(async (req,res) => {
         try {
-            const csrfToken = generateCSRFToken(req)
+            // const csrfToken = generateCSRFToken(req)
             const loanId = req.params.id
 
             const loan = await Loan.findById(loanId)
@@ -74,12 +72,12 @@ router.route('/:id')
 
             delete req.session.formData
 
-            res.render('applicant/loan/show',{error,csrfToken,loanId,name: loan.name,amount: loan.amount})
+            res.render('applicant/loan/show',{error,loanId,name: loan.name,amount: loan.amount})
         } catch (error) {
             console.error(error)
         }
     })
-    .patch(checkCSRFToken, async (req,res) => {
+    .patch(async (req,res) => {
         try {
             if(!mongoose.Types.ObjectId.isValid(req.params.id)){
                 return res.status(400).send('Invalid loan ID')
@@ -106,7 +104,7 @@ router.route('/:id')
             console.log(error)
         }
     })
-    .delete(checkCSRFToken, async (req,res) => {
+    .delete(async (req,res) => {
         try {
             await Loan.findByIdAndDelete(req.params.id)
             res.status(200).redirect('account/loan')

@@ -4,17 +4,17 @@
 function checkExistenceFields(req,res,fields){
     const result = {}
     //delete req.session.error just in case
-    delete req.session.error
+    delete req.session.errorMessage
     for(const field of fields){
         if(!req.body[field]){
-            if(!req.session.error){
-                req.session.error = `${field} is missing`
+            if(!req.session.errorMessage){
+                req.session.errorMessage = `${field} is missing`
             }
         } else{
             result[field] = req.body[field]
         }
     }
-    if(req.session.error){
+    if(req.session.errorMessage){
         req.session.formData = result
         res.status(400).redirect(req.get('Referrer'))
         return null

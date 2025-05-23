@@ -1,14 +1,13 @@
 Login page
 
-<% if (error){ %>
+<% if (errorMessage){ %>
     <div>
-        <label><%= error %></label>
+        <label><%= errorMessage %></label>
     </div>
 <% } %>
 
 
 <form action="login" method="POST">
-    <input type="hidden" name="_csrf" value="<%=csrfToken%>">
     <input type="email" name="email" value="<%=email%>">
     <input type="password" name="password" value="<%=password%>">
     <button type="submit">Login</button>

@@ -1,9 +1,6 @@
 const express = require('express')
 const bcrypt = require('bcryptjs')
 const router = express.Router()
-const { checkCSRFToken } = require('../../middlewares/csrf')
-const { generateCSRFToken } = require('../../utils/csrf')
-const { checkExistenceFields } = require('../../utils/validateFields')
 const upload = require('../../utils/upload')
 
 //import from models
@@ -14,22 +11,22 @@ const User = require('../../models/user')
 router.route('/')
     .get((req,res) => {
         //add message "complete profile if uncompleted"
-        const isLoggedIn = req.session.userId != null
-        const email = req.session.email ? req.session.email : null
+        const isLoggedIn = req.session.user != null
+        const email = req.session.user.email ? req.session.user.email : null
+        console.log(email)
         res.render('applicant/account/index',{isLoggedIn: isLoggedIn ,email: email}) 
     })
 
 router.route('/register')
     .get((req,res) => {
-        const csrfToken = generateCSRFToken(req)
-
         const {email,password,usertype} = req.session.formData || {email: '',password: '',usertype: ''}
         req.session.formData = null
         const error = req.session.error
         req.session.error = null
-        res.render('applicant/account/register',{email,password,error,csrfToken})
+        // const csrfToken = generateCSRFToken(req)
+        res.render('applicant/account/register',{email,password,error/*,csrfToken*/})
     })
-    .post(checkCSRFToken,async (req,res) => {
+    .post(async (req,res) => {
         try {
             const fields = checkExistenceFields(req,res,['email','password','usertype'])
             if(!fields){
@@ -69,15 +66,16 @@ router.route('/register')
 
 router.route('/login')
     .get((req,res) => {
-        const csrfToken = generateCSRFToken(req)
 
         const {email,password} = req.session.formData || {email: '',password: ''}
         delete req.session.formData
         const error = req.session.error
         delete req.session.error
-        res.render('applicant/account/login',{email,password,error,csrfToken})
+        // const csrfToken = generateCSRFToken(req)
+        res.render('applicant/account/login',{email,password,error/*,csrfToken*/})
     })
-    .post(checkCSRFToken,async (req,res) => {
+    // .post(checkCSRFToken,async (req,res) => {
+    .post(async (req,res) => {
         try {
             const fields = checkExistenceFields(req,res,['email','password'])
 
@@ -122,19 +120,17 @@ router.route('/login')
 
 router.route('/edit')
     .get((req,res) => {
-        csrfToken = generateCSRFToken(req)
-
+        // const csrfToken = generateCSRFToken(req)
         email = req.session.email
         const successMessage = req.session.successMessage
         delete req.session.successMessage
         const error = req.session.error
         delete req.session.error
-
         const name = null
-        
-        res.render('applicant/account/edit',{ error,email,successMessage,csrfToken,name })
+        res.render('applicant/account/edit',{ error,email,successMessage/*,csrfToken*/,name })
     })
-    .patch(upload.single('CNI'),checkCSRFToken,async (req,res) => {
+    // .patch(upload.single('CNI'),checkCSRFToken,async (req,res) => {
+    .patch(upload.single('CNI'),async (req,res) => {
         try {
             const ApplicantFields = checkExistenceFields(req,res,['name'])
             if(!ApplicantFields){
@@ -144,19 +140,19 @@ router.route('/edit')
 
             const applicant = await Applicant.findOne({ user: req.session.user._id })
             applicant.name = name
+
             applicant.CNI = {
                 data: req.file.buffer,
                 contentType: req.file.mimetype
             }
 
             await applicant.save()
-
             res.status(200).redirect('edit')
         } catch (error) {
             console.error(error)
         }
     })
-    .delete(checkCSRFToken,async (req,res) => {
+    .delete(async (req,res) => {
         try {
             await User.findOneAndDelete({ _id: req.session.userId })
             res.status(200).redirect('logout')

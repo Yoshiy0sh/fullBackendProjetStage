@@ -1,9 +1,8 @@
 const express = require('express')
 const router = express.Router()
 const bcrypt = require('bcryptjs')
-const { checkCSRFToken } = require('../middlewares/csrf')
-const { generateCSRFToken } = require('../utils/csrf')
 const { checkExistenceFields } = require('../utils/validateFields')
+const { checkMessageFields } = require('../middlewares/sessionFields')
 
 const Applicant = require('../models/applicant')
 const User = require('../models/user')
@@ -11,6 +10,7 @@ const User = require('../models/user')
 //routers
 const applicantRouter = require('./applicant/index')
 router.use('/applicant',applicantRouter)
+router.use(checkMessageFields)
 
 router.route('/')
     .get((req,res)=>{
@@ -19,15 +19,12 @@ router.route('/')
 
 router.route('/register')
     .get((req,res) => {
-        const csrfToken = generateCSRFToken(req)
-
+        // const csrfToken = generateCSRFToken(req)
         const {email,password,usertype} = req.session.formData || {email: '',password: '',usertype: ''}
         req.session.formData = null
-        const error = req.session.error
-        req.session.error = null
-        res.render('register',{email,password,error,csrfToken})
+        res.render('register',{email,password/*errorcsrfToken*/})
     })
-    .post(checkCSRFToken,async (req,res) => {
+    .post(async (req,res) => {
         try {
             const fields = checkExistenceFields(req,res,['email','password','usertype'])
             if(!fields){
@@ -67,15 +64,12 @@ router.route('/register')
 
 router.route('/login')
     .get((req,res) => {
-        const csrfToken = generateCSRFToken(req)
-
+        // const csrfToken = generateCSRFToken(req)
         const {email,password} = req.session.formData || {email: '',password: ''}
         delete req.session.formData
-        const error = req.session.error
-        delete req.session.error
-        res.render('login',{email,password,error,csrfToken})
+        res.render('login',{email,password/*,csrfToken*/})
     })
-    .post(checkCSRFToken,async (req,res) => {
+    .post(async (req,res) => {
         try {
             const fields = checkExistenceFields(req,res,['email','password'])
 
@@ -89,7 +83,7 @@ router.route('/login')
 
             if(!user){
                 req.session.formData = {email,password}
-                req.session.error = 'User not found'
+                req.session.errorMessage = 'User not found'
                 return res.status(404).redirect('login')
             }
 
@@ -107,6 +101,7 @@ router.route('/login')
                 }
 
                 req.session.user = user
+                console.log('connected : ' + req.session.user.email)
 
                 //careful, we include the field usertype in our uri
                 res.redirect(`/${user.usertype}/account`)
@@ -126,7 +121,7 @@ router.route('/logout')
 
 router.route('/edit')
     .get((req,res) => {
-        csrfToken = generateCSRFToken(req)
+        // csrfToken = generateCSRFToken(req)
 
         email = req.session.user.email
         const successMessage = req.session.successMessage
@@ -136,9 +131,9 @@ router.route('/edit')
 
         const name = null
         
-        res.render('edit',{ error,email,successMessage,csrfToken,name })
+        res.render('edit',{ error,email,successMessage/*,csrfToken*/,name })
     })
-    .patch(checkCSRFToken,async (req,res) => {
+    .patch(async (req,res) => {
         try {
             const UserFields = checkExistenceFields(req,res,['email'])
             if(!UserFields){
@@ -171,7 +166,7 @@ router.route('/edit')
             console.error(error)
         }
     })
-    .delete(checkCSRFToken,async (req,res) => {
+    .delete(async (req,res) => {
         try {
             await User.findOneAndDelete({ _id: req.session.user._id })
             res.status(200).redirect('logout')

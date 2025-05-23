@@ -7,7 +7,6 @@ Register Page
 <%}%>
 
 <form action="register" method="POST">
-    <input type="hidden" name="_csrf" value="<%=csrfToken%>">
     <input type="email" name="email" value="<%=email%>">
     <input type="password" name="password" value="<%=password%>">
     <select name="usertype">
