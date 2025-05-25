@@ -7,7 +7,9 @@ Login page
 <% } %>
 
 
-<form action="login" method="POST">
+<form action="/login" method="POST">
+    <input type="hidden" name="_csrf" value="<%=csrfToken%>">
+    <label>Le token est <%= csrfToken %></label>
     <input type="email" name="email" value="<%=email%>">
     <input type="password" name="password" value="<%=password%>">
     <button type="submit">Login</button>

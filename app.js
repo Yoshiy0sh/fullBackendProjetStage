@@ -3,25 +3,35 @@ if(process.env.NODE_ENV != 'production'){
 }
 
 const express = require('express')
-const path = require('path')
 const session = require('express-session')
-const { doubleCsrf } = require('csrf-csrf')
+
+//database imports
 const mongoStore = require('connect-mongo')
-// const accountRouter = require('./routes/account')
-// const loanRouter = require('./routes/loan')
+
+//route imports
 const indexRouter = require('./routes/index')
+
+//utils imports
+const path = require('path')
+
+//middlewares imports
 const methodOverride = require('method-override')
+const cookieParser = require('cookie-parser')
 
 const app = express()
 
+//view section
 app.set('view engine','ejs')
 app.set('views',path.join(__dirname,'views'))
+
+//middlewares use
 app.use(express.static(path.join(__dirname,'public')))
 app.use(express.urlencoded())
 app.use(express.json())
 app.use(methodOverride('_method'))
+app.use(cookieParser())
 
-
+//database
 const mongoose = require('mongoose')
 mongoose.connect(process.env.DATABASE_URL)
 const db = mongoose.connection
@@ -32,6 +42,7 @@ db.once('open',() => {
     console.log('Connected to DataBase')
 })
 
+//session
 app.use(session({
     secret: 'secret',
     resave: false,
@@ -48,28 +59,8 @@ app.use(session({
     }
 }))
 
-//csrf protection
-const { invalidCsrfTokenError, generateToken, doubleCsrfProtection } = doubleCsrf({
-    getSecret: () => "secret key",
-    cookieName: "csrfToken",
-    cookieOptions: {
-        httpOnly: "lax",
-        path: "/",
-        secure: process.env.NODE_ENV == "production"
-    },
-    size: 64,
-    ignoreMethods: ["GET","HEAD","OPTIONS"]
-})
-
-app.use((req,res,next) => {
-    res.locals._csrf = generateToken(req,res)
-    next()
-})
-
-
-
+//using routers
 app.use('/',indexRouter)
-// app.use('/account',accountRouter)
-// app.use('/loan',loanRouter)
 
+//starting server
 app.listen(3000,() => {console.log('Listening on port 3000')})

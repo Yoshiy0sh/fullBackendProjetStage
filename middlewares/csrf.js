@@ -1,6 +1,6 @@
 const crypto = require('crypto')
 
-function checkCSRFToken(req,res,next){
+function checkCsrfToken(req,res,next){
     console.log('\nCheckingCSRFToken')
     const token = req.body._csrf
 
@@ -19,5 +19,5 @@ function checkCSRFToken(req,res,next){
 }
 
 module.exports = {
-    checkCSRFToken
+    checkCsrfToken
 }

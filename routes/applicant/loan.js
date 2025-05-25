@@ -1,8 +1,6 @@
 const express = require('express')
 const router = express.Router()
 const mongoose = require('mongoose')
-// const { checkCSRFToken } = require('../../middlewares/csrf')
-// const { generateCSRFToken } = require('../../utils/csrf')
 const { restrictConnected } = require('../../middlewares/restriction')
 const Loan = require('../../models/loan')
 const { checkExistenceFields } = require('../../utils/validateFields')

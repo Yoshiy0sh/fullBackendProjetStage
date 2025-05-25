@@ -1,4 +1,4 @@
-function generateCSRFToken(req) {
+function generateCsrfToken(req) {
     //il faudra ajouter une façon de limiter le nombre de tokens
     console.log('\nGenerating CSRF Token\n')
     const token = require('crypto').randomBytes(24).toString('hex')
@@ -11,4 +11,4 @@ function generateCSRFToken(req) {
     return token
 }
 
-module.exports = { generateCSRFToken }
+module.exports = { generateCsrfToken }

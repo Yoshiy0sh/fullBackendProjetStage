@@ -1,16 +1,33 @@
 const express = require('express')
 const router = express.Router()
-const bcrypt = require('bcryptjs')
-const { checkExistenceFields } = require('../utils/validateFields')
-const { checkMessageFields } = require('../middlewares/sessionFields')
 
-const Applicant = require('../models/applicant')
-const User = require('../models/user')
+//utils import
+const { checkFields } = require('../utils/validateFields')
+
+//middlewares imports
+const { checkBasicSessionFields, checkFormSessionFields } = require('../middlewares/sessionFields')
+const { checkCsrfToken } = require('../middlewares/csrf')
+
+//controllers import
+const { 
+    renderRegisterPage,
+    createNewUser
+ } = require('../controllers/authControllers')
 
 //routers
 const applicantRouter = require('./applicant/index')
 router.use('/applicant',applicantRouter)
-router.use(checkMessageFields)
+
+//checks
+router.use(checkBasicSessionFields)
+router.use((req,res,next) => {
+    if(!req.method === 'GET'){
+        checkCsrfToken(req,res,next)
+    }
+    else{
+        next()
+    }
+})
 
 router.route('/')
     .get((req,res)=>{
@@ -18,55 +35,15 @@ router.route('/')
     })
 
 router.route('/register')
-    .get((req,res) => {
-        // const csrfToken = generateCSRFToken(req)
-        const {email,password,usertype} = req.session.formData || {email: '',password: '',usertype: ''}
-        req.session.formData = null
-        res.render('register',{email,password/*errorcsrfToken*/})
-    })
-    .post(async (req,res) => {
-        try {
-            const fields = checkExistenceFields(req,res,['email','password','usertype'])
-            if(!fields){
-                return
-            }
-            const {email,password,usertype} = fields
-
-            //is email unique ?
-            const existingUser = await User.findOne({email : email})
-            if(existingUser){
-                req.session.formData = {email,password,usertype}
-                req.session.error = 'Email already in use'
-                return res.status(409).redirect('register')
-            }
-
-            //hashing password
-            const saltRounds = 10
-            const hash  = await bcrypt.hash(password,saltRounds)
-
-            //create and save newUser
-            const newUser = new User({
-                email: email,
-                password: hash,
-                usertype: usertype
-            })
-
-            await newUser.save()
-            console.log('New user : ', newUser)
-
-            modelGeneratorUsertype(usertype,newUser._id)
-
-            res.status(201).redirect('login')
-        } catch (error) {
-            console.error(error)
-        }
-    })
+    .get(checkFormSessionFields,renderRegisterPage)
+    .post(createNewUser)
 
 router.route('/login')
     .get((req,res) => {
         // const csrfToken = generateCSRFToken(req)
         const {email,password} = req.session.formData || {email: '',password: ''}
         delete req.session.formData
+        console.log(res.locals.csrfToken)
         res.render('login',{email,password/*,csrfToken*/})
     })
     .post(async (req,res) => {
@@ -176,17 +153,6 @@ router.route('/edit')
         }
     })
 
-async function modelGeneratorUsertype(usertype,userId){
-    if(usertype == 'applicant'){
-        const newApplicant = new Applicant({ user: userId })
-        await newApplicant.save()
-        return newApplicant
-    } else if(usertype == 'loanOfficer'){
-        return null
-    }
-    else{
-        return null
-    }
-}
+
 
 module.exports = router
