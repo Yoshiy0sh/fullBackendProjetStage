@@ -11,7 +11,11 @@ const { checkCsrfToken } = require('../middlewares/csrf')
 //controllers import
 const { 
     renderRegisterPage,
-    createNewUser
+    createNewUser,
+    renderLoginPage,
+    loginUser,
+    renderEditPage,
+    patchUserData
  } = require('../controllers/authControllers')
 
 //routers
@@ -35,59 +39,12 @@ router.route('/')
     })
 
 router.route('/register')
-    .get(checkFormSessionFields,renderRegisterPage)
+    .get(renderRegisterPage)
     .post(createNewUser)
 
 router.route('/login')
-    .get((req,res) => {
-        // const csrfToken = generateCSRFToken(req)
-        const {email,password} = req.session.formData || {email: '',password: ''}
-        delete req.session.formData
-        console.log(res.locals.csrfToken)
-        res.render('login',{email,password/*,csrfToken*/})
-    })
-    .post(async (req,res) => {
-        try {
-            const fields = checkExistenceFields(req,res,['email','password'])
-
-            if(!fields){
-                return
-            }
-
-            const {email, password} = fields
-
-            const user = await User.findOne({email:email})
-
-            if(!user){
-                req.session.formData = {email,password}
-                req.session.errorMessage = 'User not found'
-                return res.status(404).redirect('login')
-            }
-
-            const isMatch = await bcrypt.compare(password,user.password)
-            if(!isMatch){
-                req.session.formData = {email,password}
-                req.session.error = 'Invalid password'
-                return res.status(401).redirect('login')
-            }
-
-            req.session.regenerate((err) => {
-                if(err){
-                    console.error('Error regenerating session',err)
-                    return res.status(500).send('Internal server error')
-                }
-
-                req.session.user = user
-                console.log('connected : ' + req.session.user.email)
-
-                //careful, we include the field usertype in our uri
-                res.redirect(`/${user.usertype}/account`)
-            })
-        } catch (error) {
-            console.error(error)
-            res.status(500).json({message: 'Server Error'})
-        }
-    })
+    .get(renderLoginPage)
+    .post(loginUser)
 
 router.route('/logout')
     .get((req,res) => {
@@ -97,19 +54,7 @@ router.route('/logout')
     })
 
 router.route('/edit')
-    .get((req,res) => {
-        // csrfToken = generateCSRFToken(req)
-
-        email = req.session.user.email
-        const successMessage = req.session.successMessage
-        delete req.session.successMessage
-        const error = req.session.error
-        delete req.session.error
-
-        const name = null
-        
-        res.render('edit',{ error,email,successMessage/*,csrfToken*/,name })
-    })
+    .get(renderEditPage)
     .patch(async (req,res) => {
         try {
             const UserFields = checkExistenceFields(req,res,['email'])

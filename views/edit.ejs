@@ -1,8 +1,8 @@
 Edit page
 
-<% if (error){ %>
+<% if (errorMessage){ %>
     <div>
-        <label><%= error %></label>
+        <label><%= errorMessage %></label>
     </div>
 <% } %>
 
@@ -15,11 +15,13 @@ Edit page
 <div>
     <h2>Edit User</h2>
     <form action="edit?_method=PATCH" method="POST" enctype="multipart/form-data">
+        <input type="hidde" name="_csrf" value="<%=csrfToken%>">
         <input type="email" name="email" value="<%=email%>">
         <br>
         <button type="submit">Submit</button>
     </form>
     <form action="edit?_method=DELETE" method="POST">
+        <input type="hidde" name="_csrf" value="<%=csrfToken%>">
         <button type="submit">Delete</button>
     </form>
 </div>

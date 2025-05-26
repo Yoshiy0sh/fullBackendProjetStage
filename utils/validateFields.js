@@ -39,6 +39,7 @@ function pushBodyToSessionFields(req,res,fields){
             }
         }
     }
+    console.log('on a trouvé le mdp ' + req.session.formFields.password)
     res.status(400).redirect(req.get('Referrer'))
 }
 
@@ -47,13 +48,9 @@ function pushBodyToSessionFields(req,res,fields){
 function checkFields(req,res,fields){
     if(!fields.every(field => req.body && req.body[field])){
         pushBodyToSessionFields(req,res,fields)
+        return false
     }
+    return true
 }
 
-function initializeEmptyFields(res,fields){
-    for(const field of fields){
-        res.locals[field] = null
-    }
-}
-
-module.exports = { checkFields,initializeEmptyFields }
+module.exports = { checkFields }

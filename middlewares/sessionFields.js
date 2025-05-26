@@ -4,7 +4,7 @@ function checkBasicSessionFields(req,res,next){
     if(req.session){
         fields.forEach(field => {
             res.locals[field] = req.session[field] ? req.session[field] : null
-            delete req.session[field]
+            req.session[field] = null
         })
     }
     else{
@@ -22,6 +22,7 @@ function checkFormSessionFields(req,res,next){
         const fields = Object.keys(req.session.formFields)
         for(const field of fields){
             res.locals[field] = req.session.formFields[field]
+            req.session.formFields[field] = null
         }
     }
     next()
