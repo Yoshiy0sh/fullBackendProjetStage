@@ -4,5 +4,10 @@ Index page
     <label>Connected</label>
 <% } %>
 
+<% if(errorMessage){ %>
+    <label><%=errorMessage%></label>
+<% } %>
+
 <a href="/login">login</a>
 <a href="/register">register</a>
+<a href="/edit">edit account</a>

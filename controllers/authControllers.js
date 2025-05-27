@@ -6,12 +6,12 @@ const Applicant = require('../models/applicant')
 const bcrypt = require('bcryptjs')
 const { checkFields,initializeEmptyFields } = require('../utils/validateFields')
 const { generateCsrfToken } = require('../utils/csrf')
-
+const { callWebhookWithEmail } = require('../utils/mail')
 
 
 //get /register
 function renderRegisterPage(req,res){
-    initializeFields(req,res,['email','password','username'])
+    initializeFields(req,res,['emailRegister','passwordRegister','usernameRegister'])
     res.locals.csrfToken = generateCsrfToken(req)
     res.render('register')
 }
@@ -20,33 +20,36 @@ function renderRegisterPage(req,res){
 async function createNewUser(req,res){
     try {
         //we assume the data is stored in req.body
-        if(!checkFields(req,res,['email','password','usertype'])){
+        if(!checkFields(req,res,['emailRegister','passwordRegister','usertypeRegister'])){
             return
         }
 
         //is email unique ?
-        const existingUser = await User.findOne({email : req.body.email})
+        const existingUser = await User.findOne({email : req.body.emailRegister})
         if(existingUser){
-            req.session.formFields = {email: req.body.email}
+            req.session.formFields = {email: req.body.emailRegister}
             req.session.errorMessage = 'email already in use'
             return res.status(409).redirect('register')
         }
 
         //hashing password
         const saltRounds = 10
-        const hash  = await bcrypt.hash(req.body.password,saltRounds)
+        const hash  = await bcrypt.hash(req.body.passwordRegister,saltRounds)
         //create and save newUser
-        console.log(req.body.usertype)
+        console.log(req.body.usertypeRegister)
         const newUser = new User({
-            email: req.body.email,
+            email: req.body.emailRegister,
             password: hash,
-            usertype: req.body.usertype
+            usertype: req.body.usertypeRegister
         })
 
         await newUser.save()
         console.log('New user : ', newUser)
 
-        modelGeneratorUsertype(req.body.usertype,newUser._id)
+        await modelGeneratorUsertype(req.body.usertypeRegister,newUser._id)
+
+        //send email
+        //callWebhookWithEmail(req.body.email)
 
         res.status(201).redirect('login')
     } catch (error) {
@@ -55,27 +58,28 @@ async function createNewUser(req,res){
 }
 
 function renderLoginPage(req,res){
-    initializeFields(req,res,['email','password'])
+    console.log(req.session.formFields)
+    initializeFields(req,res,['emailLogin','passwordLogin'])
     res.locals.csrfToken = generateCsrfToken(req)
     res.render('login')
 }
 
 async function loginUser(req,res){
     try {
-        if(!checkFields(req,res,['email','password'])){
+        if(!checkFields(req,res,['emailLogin','passwordLogin'])){
             return
         }
 
-        const userFound = await User.findOne({email:req.body.email})
+        const userFound = await User.findOne({email:req.body.emailLogin})
         if(!userFound){
-            req.sesison.formFields = {email:req.body.email}
+            req.session.formFields = {emailLogin:req.body.emailLogin}
             req.session.errorMessage = 'User not found'
             return res.status(404).redirect('login')
         }
 
-        const passwordMatching = await bcrypt.compare(req.body.password,userFound.password)
+        const passwordMatching = await bcrypt.compare(req.body.passwordLogin,userFound.password)
         if(!passwordMatching){
-            req.session.formFields = {email: req.session.email, password: req.body.password}
+            req.session.formFields = { email: req.session.emailLogin }
             req.session.errorMessage = 'Invalid password'
             return res.status(401).redirect('login')
         }
@@ -84,6 +88,7 @@ async function loginUser(req,res){
 
         //be careful, we include the field usertype in our uri
         res.redirect(`/${userFound.usertype}/account`)
+        console.log('pass there')
     } catch (error) {
         console.error(error)
         res.status(500).json({message: 'Server Error'})
@@ -91,42 +96,54 @@ async function loginUser(req,res){
 }
 
 function renderEditPage(req,res){
-    initializeFields(req,res,['email'])
+    initializeFields(req,res,['emailEdit'])
     res.locals.csrfToken = generateCsrfToken(req)
     res.render('edit')
 }
 
 async function patchUserData(req,res){
     try {
-        if(!checkFields(req,res,['email'])){
+        if(!checkFields(req,res,['emailEdit'])){
             return
         }
-
-        const user = await User.findById(req.session.userId)
         //do not patch email if same as in use
 
-        if(res.locals.email === user.email){
+        if(req.session.email === req.body.emailEdit){
             req.session.errorMessage = 'Email already in use by your account'
             return res.status(409).redirect('edit')
         }
 
         // do not patch email if already in use
 
-        const userFound = await User.findOne({ email:req.body.email })
+        const userFound = await User.findOne({ email:req.body.emailEdit })
         if(userFound){
             req.session.errorMessage = 'Email already in use by another account'
             return res.status(409).redirect('edit')
         }
 
-        user.email = req.body.email
+        const updatedUser = await User.findByIdAndUpdate(
+            req.session.userId,
+            { email : req.body.emailEdit },
+            { new: true}
+        )
         req.session.successMessage = "Informations successfully updated"
 
-        await user.save()
-        req.session.email = req.body.email
-        req.session.userId = req.body.userId
+        req.session.email = req.body.emailEdit
         } catch (error) {
             console.error(error)
         }
+}
+
+async function deleteUser(req,res){
+    try {
+        //delete cascade
+        await deleteChildModel(req.session.userId,req.session.usertype)
+        await User.findByIdAndDelete(req.session.userId)
+        res.status(200).redirect('logout')
+    } catch (error) {
+        console.error(error)
+        res.status(500)
+    }
 }
 
 function initializeFields(req,res,fields){
@@ -146,7 +163,6 @@ function initializeFields(req,res,fields){
             }
         }
     }
-    console.log('on passe cete argument',res.locals.email)
 }
 
 function regenerateSession(req,user){
@@ -159,6 +175,7 @@ function regenerateSession(req,user){
 
             req.session.userId = user._id
             req.session.email = user.email
+            req.session.usertype = user.usertype
             console.log('connected : ',user.email)
             resolve()
         })
@@ -178,6 +195,19 @@ async function modelGeneratorUsertype(usertype,userId){
     }
 }
 
+async function deleteChildModel(userId,usertype){
+    try{
+        if(usertype === 'applicant'){
+            await Applicant.findOneAndDelete({user: userId})
+        } else {
+            console.error('non implemented yet')
+        }
+    } catch (error){
+        console.error(error)
+        res.status(500)
+    }
+}
+
 
 
 
@@ -187,5 +217,6 @@ module.exports = {
     renderLoginPage,
     loginUser,
     renderEditPage,
-    patchUserData
+    patchUserData,
+    deleteUser
  }

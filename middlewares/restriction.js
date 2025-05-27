@@ -2,14 +2,14 @@ const User = require('../models/user')
 
 async function restrictApplicant(req,res,next){
     try {
-        if(req.session && req.session.user){
-            if(req.session.user.usertype == 'applicant'){
+        if(req.session && req.session.userId){
+            if(req.session.usertype == 'applicant'){
                 return next()
             }
         }
 
         console.log('Access denied')
-        req.session.error = "Access denied"
+        req.session.errorMessage = "Access denied ( applicant only )"
         res.status(401).redirect('/')
     } catch (error) {
         console.error(error)
@@ -18,12 +18,12 @@ async function restrictApplicant(req,res,next){
 
 function restrictConnected(req,res,next){
     try {
-        if(req.session && req.session.user){
+        if(req.session && req.session.userId){
             next()
         } else {
             console.log('Access denied')
-            req.session.error = "Access denied"
-            res.status(401).redirect('/account/login')
+            req.session.errorMessage = "Access denied ( connected only )"
+            res.status(401).redirect('/')
         }
     } catch (error) {
         console.error(error)

@@ -8,9 +8,9 @@ Register Page
 
 <form action="register" method="POST">
     <input type="hidden" name="_csrf" value="<%=csrfToken%>">
-    <input type="email" name="email" value="<%=email%>">
-    <input type="password" name="password">
-    <select name="usertype">
+    <input type="email" name="emailRegister" value="<%=emailRegister%>">
+    <input type="password" name="passwordRegister">
+    <select name="usertypeRegister">
         <option value="applicant">Applicant</option>
         <option value="loanOfficer">Loan Officer</option>
         <option value="admin">Admin</option>
