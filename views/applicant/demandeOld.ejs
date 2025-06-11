@@ -1,0 +1,915 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Demande de Prêt - NexLoan</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="simulation-body">
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+    <!-- Navigation Header -->
+    <header class="header">
+        <div class="container">
+            <div class="nav-wrapper">
+                <!-- Logo -->
+                <div class="logo">
+                    <i class="fas fa-home logo-icon"></i>
+                    <span class="logo-text">NexLoan</span>
+                </div>
+
+                <!-- Navigation Menu -->
+                <nav class="nav-menu">
+                    <ul>
+                        <li><a href="/#services">Prêt Immobilier</a></li>
+                        <li><a href="/#services">Renégociation de Prêt</a></li>
+                        <li><a href="/#blog">Blog</a></li>
+                        <li><a href="/#avis-clients">Avis Clients</a></li>
+                        <li><a href="/#contact">Contact</a></li>
+                    </ul>
+                </nav>
+
+                <!-- CTA and Login Buttons -->
+                <div class="header-buttons">
+                    <span class="user-welcome">Bonjour, <%= firstNameDemande %></span>
+                    <a href="/dashboard" class="btn btn-primary">Tableau de bord</a>
+                    <form action="/logout" method="POST" style="display: inline;">
+                        <button type="submit" class="btn btn-outline-primary">Déconnexion</button>
+                    </form>
+                </div>
+
+                <!-- Mobile Menu Button -->
+                <div class="mobile-menu-btn">
+                    <i class="fas fa-bars"></i>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Demande Modal -->
+    <div class="simulation-overlay">
+        <div class="simulation-modal">
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <button class="back-btn" onclick="history.back()">
+                    <i class="fas fa-arrow-left"></i>
+                    Retour
+                </button>
+                <h1>Demande de Prêt Immobilier</h1>
+                <button class="close-btn" onclick="window.location.href='/'">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <!-- Modal Content -->
+            <div class="modal-content">
+                <!-- Sidebar Navigation -->
+                <div class="simulation-sidebar">
+                    <div class="step-section">
+                        <h3>Votre projet</h3>
+                        <div class="step-item active">
+                            <i class="fas fa-circle"></i>
+                            <span>Type de projet</span>
+                        </div>
+                    </div>
+
+                    <div class="step-section">
+                        <h3>Documents essentiels</h3>
+                        <div class="step-item disabled">
+                            <i class="fas fa-circle"></i>
+                            <span>Pièce d'identité</span>
+                        </div>
+                        <div class="step-item disabled">
+                            <i class="fas fa-circle"></i>
+                            <span>Justificatif de revenus</span>
+                        </div>
+                        <div class="step-item disabled">
+                            <i class="fas fa-circle"></i>
+                            <span>Relevés bancaires</span>
+                        </div>
+                    </div>
+
+                    <div class="step-section">
+                        <h3>Informations personnelles</h3>
+                        <div class="step-item disabled">
+                            <i class="fas fa-circle"></i>
+                            <span>État civil</span>
+                        </div>
+                        <div class="step-item disabled">
+                            <i class="fas fa-circle"></i>
+                            <span>Situation familiale</span>
+                        </div>
+                    </div>
+
+                    <div class="step-section">
+                        <h3>Situation professionnelle</h3>
+                        <div class="step-item disabled">
+                            <i class="fas fa-circle"></i>
+                            <span>Activité professionnelle</span>
+                        </div>
+                    </div>
+
+                    <div class="step-section">
+                        <h3>Finances</h3>
+                        <div class="step-item disabled">
+                            <i class="fas fa-circle"></i>
+                            <span>Revenus</span>
+                        </div>
+                        <div class="step-item disabled">
+                            <i class="fas fa-circle"></i>
+                            <span>Charges</span>
+                        </div>
+                    </div>
+
+                    <div class="step-section">
+                        <h3>Financement</h3>
+                        <div class="step-item disabled">
+                            <i class="fas fa-circle"></i>
+                            <span>Détails du prêt</span>
+                        </div>
+                    </div>
+
+                    <div class="step-section">
+                        <h3>Documents complémentaires</h3>
+                        <div class="step-item disabled">
+                            <i class="fas fa-circle"></i>
+                            <span>Documents du projet</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Main Content -->
+                <div class="simulation-main">
+                    <!-- Step 1: Type de projet -->
+                    <div class="step-content active" id="step-projet">
+                        <div class="question-container">
+                            <h2>Quel est votre projet immobilier ?</h2>
+                            
+                            <div class="options-grid">
+                                <button class="option-card" data-option="achat-residence-principale">
+                                    <i class="fas fa-home"></i>
+                                    <span>Achat résidence principale</span>
+                                </button>
+                                <button class="option-card" data-option="achat-residence-secondaire">
+                                    <i class="fas fa-mountain"></i>
+                                    <span>Achat résidence secondaire</span>
+                                </button>
+                                <button class="option-card" data-option="investissement-locatif">
+                                    <i class="fas fa-building"></i>
+                                    <span>Investissement locatif</span>
+                                </button>
+                                <button class="option-card" data-option="construction">
+                                    <i class="fas fa-hammer"></i>
+                                    <span>Construction</span>
+                                </button>
+                                <button class="option-card" data-option="travaux">
+                                    <i class="fas fa-tools"></i>
+                                    <span>Travaux</span>
+                                </button>
+                                <button class="option-card" data-option="rachat-credit">
+                                    <i class="fas fa-sync-alt"></i>
+                                    <span>Rachat de crédit</span>
+                                </button>
+                            </div>
+
+                            <div class="navigation-buttons">
+                                <button class="btn btn-outline-primary" onclick="history.back()">Précédent</button>
+                                <button class="btn btn-primary" id="nextBtn" disabled>Suivant</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 2: Pièce d'identité -->
+                    <div class="step-content" id="step-piece-identite">
+                        <div class="question-container">
+                            <h2>Téléchargez votre pièce d'identité</h2>
+                            
+                            <div class="document-upload-container">
+                                <div class="document-info">
+                                    <div class="document-icon">
+                                        <i class="fas fa-id-card"></i>
+                                    </div>
+                                    <div class="document-description">
+                                        <h3>Carte d'identité ou passeport</h3>
+                                        <p>Nous allons extraire automatiquement vos informations d'état civil pour faciliter votre demande.</p>
+                                        <ul class="document-requirements">
+                                            <li><i class="fas fa-check"></i> Document en cours de validité</li>
+                                            <li><i class="fas fa-check"></i> Recto et verso pour une carte d'identité</li>
+                                            <li><i class="fas fa-check"></i> Format PDF uniquement</li>
+                                            <li><i class="fas fa-check"></i> Document lisible et non tronqué</li>
+                                        </ul>
+                                    </div>
+                                </div>
+
+                                <div class="upload-container">
+                                    <div class="file-upload">
+                                        <input type="file" id="piece-identite" accept=".pdf" required>
+                                        <div class="upload-zone">
+                                            <i class="fas fa-cloud-upload-alt"></i>
+                                            <p>Déposez votre pièce d'identité ici</p>
+                                            <span>ou</span>
+                                            <button type="button" class="btn btn-outline-primary btn-sm">Parcourir</button>
+                                            <span class="file-info">Format accepté: PDF, JPG, PNG</span>
+                                        </div>
+                                    </div>
+                                    <div class="uploaded-files"></div>
+                                </div>
+
+                                <div class="extraction-status" style="display: none;">
+                                    <div class="extraction-progress">
+                                        <div class="spinner"></div>
+                                        <p>Extraction des données en cours...</p>
+                                    </div>
+                                    <div class="extraction-success" style="display: none;">
+                                        <i class="fas fa-check-circle"></i>
+                                        <p>Extraction réussie ! Veuillez vérifier les informations à l'étape suivante.</p>
+                                    </div>
+                                    <div class="extraction-error" style="display: none;">
+                                        <i class="fas fa-exclamation-circle"></i>
+                                        <p>Impossible d'extraire toutes les données. Vous pourrez les compléter manuellement à l'étape suivante.</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="navigation-buttons">
+                                <button class="btn btn-outline-primary" id="prevBtn">Précédent</button>
+                                <button class="btn btn-primary" id="nextBtn" disabled>Suivant</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 3: Justificatif de revenus -->
+                    <div class="step-content" id="step-justificatif-revenus">
+                        <div class="question-container">
+                            <h2>Téléchargez votre avis d'imposition</h2>
+                            
+                            <div class="document-upload-container">
+                                <div class="document-info">
+                                    <div class="document-icon">
+                                        <i class="fas fa-file-invoice-dollar"></i>
+                                    </div>
+                                    <div class="document-description">
+                                        <h3>Avis d'imposition</h3>
+                                        <p>Nous allons extraire automatiquement vos revenus pour faciliter votre demande.</p>
+                                        <ul class="document-requirements">
+                                            <li><i class="fas fa-check"></i> Dernier avis d'imposition reçu</li>
+                                            <li><i class="fas fa-check"></i> Document complet (toutes les pages)</li>
+                                            <li><i class="fas fa-check"></i> Format PDF uniquement</li>
+                                            <li><i class="fas fa-check"></i> Document lisible et non tronqué</li>
+                                        </ul>
+                                    </div>
+                                </div>
+
+                                <div class="upload-container">
+                                    <div class="file-upload">
+                                        <input type="file" id="avis-imposition" accept=".pdf" required>
+                                        <div class="upload-zone">
+                                            <i class="fas fa-cloud-upload-alt"></i>
+                                            <p>Déposez votre avis d'imposition ici</p>
+                                            <span>ou</span>
+                                            <button type="button" class="btn btn-outline-primary btn-sm">Parcourir</button>
+                                            <span class="file-info">Format accepté: PDF, JPG, PNG</span>
+                                        </div>
+                                    </div>
+                                    <div class="uploaded-files"></div>
+                                </div>
+
+                                <div class="extraction-status" style="display: none;">
+                                    <div class="extraction-progress">
+                                        <div class="spinner"></div>
+                                        <p>Extraction des données en cours...</p>
+                                    </div>
+                                    <div class="extraction-success" style="display: none;">
+                                        <i class="fas fa-check-circle"></i>
+                                        <p>Extraction réussie ! Veuillez vérifier les informations à l'étape suivante.</p>
+                                    </div>
+                                    <div class="extraction-error" style="display: none;">
+                                        <i class="fas fa-exclamation-circle"></i>
+                                        <p>Impossible d'extraire toutes les données. Vous pourrez les compléter manuellement à l'étape suivante.</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="navigation-buttons">
+                                <button class="btn btn-outline-primary" id="prevBtn">Précédent</button>
+                                <button class="btn btn-primary" id="nextBtn" disabled>Suivant</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 4: Relevés bancaires -->
+                    <div class="step-content" id="step-releves-bancaires">
+                        <div class="question-container">
+                            <h2>Téléchargez vos relevés bancaires</h2>
+                            
+                            <div class="document-upload-container">
+                                <div class="document-info">
+                                    <div class="document-icon">
+                                        <i class="fas fa-university"></i>
+                                    </div>
+                                    <div class="document-description">
+                                        <h3>Relevés de compte</h3>
+                                        <p>Nous allons analyser automatiquement vos charges et crédits en cours pour faciliter votre demande.</p>
+                                        <ul class="document-requirements">
+                                            <li><i class="fas fa-check"></i> 3 derniers mois de relevés</li>
+                                            <li><i class="fas fa-check"></i> Tous vos comptes courants</li>
+                                            <li><i class="fas fa-check"></i> Format PDF uniquement</li>
+                                            <li><i class="fas fa-check"></i> Documents lisibles et non tronqués</li>
+                                        </ul>
+                                    </div>
+                                </div>
+
+                                <div class="upload-container">
+                                    <div class="file-upload">
+                                        <input type="file" id="releves-bancaires" accept=".pdf" multiple required>
+                                        <div class="upload-zone">
+                                            <i class="fas fa-cloud-upload-alt"></i>
+                                            <p>Déposez vos relevés bancaires ici</p>
+                                            <span>ou</span>
+                                            <button type="button" class="btn btn-outline-primary btn-sm">Parcourir</button>
+                                            <span class="file-info">Format accepté: PDF, JPG, PNG</span>
+                                        </div>
+                                    </div>
+                                    <div class="uploaded-files"></div>
+                                </div>
+
+                                <div class="extraction-status" style="display: none;">
+                                    <div class="extraction-progress">
+                                        <div class="spinner"></div>
+                                        <p>Analyse des données en cours...</p>
+                                    </div>
+                                    <div class="extraction-success" style="display: none;">
+                                        <i class="fas fa-check-circle"></i>
+                                        <p>Analyse réussie ! Veuillez vérifier les informations à l'étape suivante.</p>
+                                    </div>
+                                    <div class="extraction-error" style="display: none;">
+                                        <i class="fas fa-exclamation-circle"></i>
+                                        <p>Impossible d'analyser toutes les données. Vous pourrez les compléter manuellement à l'étape suivante.</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="navigation-buttons">
+                                <button class="btn btn-outline-primary" id="prevBtn">Précédent</button>
+                                <button class="btn btn-primary" id="nextBtn" disabled>Suivant</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 5: État civil (vérification des données extraites) -->
+                    <div class="step-content" id="step-etat-civil">
+                        <div class="question-container">
+                            <h2>Vérifiez vos informations d'état civil</h2>
+                            <p class="extraction-notice">Ces informations ont été extraites de votre pièce d'identité. Veuillez les vérifier et les compléter si nécessaire.</p>
+                            
+                            <div class="form-container">
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="nom">Nom *</label>
+                                        <input type="text" id="nom" name="lastNameLoan" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="prenom">Prénom *</label>
+                                        <input type="text" id="prenom" name="firstNameLoan" required>
+                                    </div>
+                                </div>
+
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="dateNaissance">Date de naissance *</label>
+                                        <input type="date" id="dateNaissance" name="dateNaissance" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="lieuNaissance">Lieu de naissance *</label>
+                                        <input type="text" id="lieuNaissance" name="lieuNaissance" required>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="adresse">Adresse complète *</label>
+                                    <input type="text" id="adresse" name="adresse" placeholder="Numéro, rue" required>
+                                </div>
+
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="codePostal">Code postal *</label>
+                                        <input type="text" id="codePostal" name="codePostal" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="commune">Commune *</label>
+                                        <input type="text" id="commune" name="commune" required>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="situationLogement">Situation du logement actuel *</label>
+                                    <select id="situationLogement" name="situationLogement" required>
+                                        <option value="">Choisissez...</option>
+                                        <option value="proprietaire">Propriétaire</option>
+                                        <option value="locataire">Locataire</option>
+                                        <option value="heberge">Hébergé gratuitement</option>
+                                        <option value="autre">Autre</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="email">Adresse email *</label>
+                                        <input type="email" id="email" name="email" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="telephone">Téléphone *</label>
+                                        <input type="tel" id="telephone" name="telephone" required>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="navigation-buttons">
+                                <button class="btn btn-outline-primary" id="prevBtn">Précédent</button>
+                                <button class="btn btn-primary" id="nextBtn" disabled>Suivant</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 6: Situation familiale -->
+                    <div class="step-content" id="step-situation-familiale">
+                        <div class="question-container">
+                            <h2>Votre situation familiale</h2>
+                            
+                            <div class="form-container">
+                                <div class="form-group">
+                                    <label for="situationMatrimoniale">Situation matrimoniale *</label>
+                                    <select id="situationMatrimoniale" name="situationMatrimoniale" required>
+                                        <option value="">Choisissez...</option>
+                                        <option value="celibataire">Célibataire</option>
+                                        <option value="marie-communaute">Marié(e) - Communauté réduite aux acquêts</option>
+                                        <option value="marie-separation">Marié(e) - Séparation de biens</option>
+                                        <option value="marie-communaute-universelle">Marié(e) - Communauté universelle</option>
+                                        <option value="pacs">Pacsé(e)</option>
+                                        <option value="divorce">Divorcé(e)</option>
+                                        <option value="separe">Séparé(e) de corps</option>
+                                        <option value="veuf">Veuf(ve)</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-group" id="dateMariagePacs" style="display: none;">
+                                    <label for="dateUnion">Date du mariage/PACS</label>
+                                    <input type="date" id="dateUnion" name="dateUnion">
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="nombreEnfants">Nombre d'enfants à charge</label>
+                                    <select id="nombreEnfants" name="nombreEnfants">
+                                        <option value="0">0</option>
+                                        <option value="1">1</option>
+                                        <option value="2">2</option>
+                                        <option value="3">3</option>
+                                        <option value="4">4</option>
+                                        <option value="5+">5 ou plus</option>
+                                    </select>
+                                </div>
+
+                                <div id="enfantsDetails" style="display: none;">
+                                    <h4>Âge des enfants</h4>
+                                    <div id="enfantsContainer"></div>
+                                </div>
+                            </div>
+
+                            <div class="navigation-buttons">
+                                <button class="btn btn-outline-primary" id="prevBtn">Précédent</button>
+                                <button class="btn btn-primary" id="nextBtn" disabled>Suivant</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 7: Activité professionnelle -->
+                    <div class="step-content" id="step-activite-pro">
+                        <div class="question-container">
+                            <h2>Votre activité professionnelle</h2>
+                            <p class="extraction-notice">Certaines informations ont été extraites de vos documents. Veuillez les vérifier et les compléter.</p>
+                            
+                            <div class="form-container">
+                                <div class="form-group">
+                                    <label for="situationProfessionnelle">Situation professionnelle *</label>
+                                    <select id="situationProfessionnelle" name="situationProfessionnelle" required>
+                                        <option value="">Choisissez...</option>
+                                        <option value="cdi">CDI</option>
+                                        <option value="cdd">CDD</option>
+                                        <option value="interim">Intérim</option>
+                                        <option value="micro-entrepreneur">Micro-entrepreneur</option>
+                                        <option value="independant-reglemente">Indépendant (profession libérale réglementée)</option>
+                                        <option value="independant-non-reglemente">Indépendant (profession libérale non réglementée)</option>
+                                        <option value="commercant">Commerçant</option>
+                                        <option value="artisan">Artisan</option>
+                                        <option value="agriculteur">Agriculteur</option>
+                                        <option value="gerant">Gérant (associé) d'entreprise</option>
+                                        <option value="fonctionnaire">Fonctionnaire</option>
+                                        <option value="retraite">Retraité</option>
+                                        <option value="chomage">En recherche d'emploi</option>
+                                        <option value="etudiant">Étudiant</option>
+                                        <option value="autre">Autre</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-group" id="pourcentageDetention" style="display: none;">
+                                    <label for="pourcentage">Pourcentage de détention dans la société (%)</label>
+                                    <input type="number" id="pourcentage" name="pourcentage" min="0" max="100">
+                                </div>
+
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="dateDebutContrat">Date de début de contrat/activité *</label>
+                                        <input type="date" id="dateDebutContrat" name="dateDebutContrat" required>
+                                    </div>
+                                    <div class="form-group" id="dateFinContrat" style="display: none;">
+                                        <label for="dateFin">Date de fin de contrat</label>
+                                        <input type="date" id="dateFin" name="dateFin">
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="nomEntreprise">Nom de l'entreprise *</label>
+                                    <input type="text" id="nomEntreprise" name="nomEntreprise" required>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="adresseEntreprise">Adresse de l'entreprise *</label>
+                                    <input type="text" id="adresseEntreprise" name="adresseEntreprise" required>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="residenceFiscale">Résidence fiscale *</label>
+                                    <select id="residenceFiscale" name="residenceFiscale" required>
+                                        <option value="">Choisissez...</option>
+                                        <option value="france">France</option>
+                                        <option value="autre">Autre pays</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-group" id="paysResidence" style="display: none;">
+                                    <label for="pays">Précisez le pays</label>
+                                    <input type="text" id="pays" name="pays">
+                                </div>
+                            </div>
+
+                            <div class="navigation-buttons">
+                                <button class="btn btn-outline-primary" id="prevBtn">Précédent</button>
+                                <button class="btn btn-primary" id="nextBtn" disabled>Suivant</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 8: Revenus (vérification des données extraites) -->
+                    <div class="step-content" id="step-revenus">
+                        <div class="question-container">
+                            <h2>Vérifiez vos revenus</h2>
+                            <p class="extraction-notice">Ces informations ont été extraites de votre avis d'imposition. Veuillez les vérifier et les compléter si nécessaire.</p>
+                            
+                            <div class="form-container">
+                                <div class="form-group">
+                                    <label for="salaireNet">Salaire net mensuel (€) *</label>
+                                    <div class="input-with-currency">
+                                        <input type="number" id="salaireNet" name="salaireNet" min="0" required>
+                                        <span class="currency">€</span>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="revenuNetImposable">Revenu net imposable annuel (€) *</label>
+                                    <div class="input-with-currency">
+                                        <input type="number" id="revenuNetImposable" name="revenuNetImposable" min="0" required>
+                                        <span class="currency">€</span>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="rfr">Revenu fiscal de référence (€) *</label>
+                                    <div class="input-with-currency">
+                                        <input type="number" id="rfr" name="rfr" min="0" required>
+                                        <span class="currency">€</span>
+                                    </div>
+                                    <small class="form-help">Indiqué sur votre avis d'imposition</small>
+                                </div>
+
+                                <div class="form-group" id="beneficesGroup" style="display: none;">
+                                    <label for="benefices">Bénéfices annuels (€)</label>
+                                    <div class="input-with-currency">
+                                        <input type="number" id="benefices" name="benefices" min="0">
+                                        <span class="currency">€</span>
+                                    </div>
+                                    <small class="form-help">Bénéfices indiqués sur la liasse fiscale</small>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="primes">Primes et avantages en nature annuels (€)</label>
+                                    <div class="input-with-currency">
+                                        <input type="number" id="primes" name="primes" min="0" value="0">
+                                        <span class="currency">€</span>
+                                    </div>
+                                </div>
+
+                                <h4>Autres revenus</h4>
+                                
+                                <div class="form-group">
+                                    <label for="revenusValeursMobilieres">Revenus de valeurs mobilières (€/an)</label>
+                                    <div class="input-with-currency">
+                                        <input type="number" id="revenusValeursMobilieres" name="revenusValeursMobilieres" min="0" value="0">
+                                        <span class="currency">€</span>
+                                    </div>
+                                    <small class="form-help">Actions, obligations, SICAV, FCP</small>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="dividendes">Dividendes (€/an)</label>
+                                    <div class="input-with-currency">
+                                        <input type="number" id="dividendes" name="dividendes" min="0" value="0">
+                                        <span class="currency">€</span>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="revenusImmobiliers">Revenus immobiliers/fonciers (€/an)</label>
+                                    <div class="input-with-currency">
+                                        <input type="number" id="revenusImmobiliers" name="revenusImmobiliers" min="0" value="0">
+                                        <span class="currency">€</span>
+                                    </div>
+                                    <small class="form-help">Locations, parts de rendement, défiscalisation</small>
+                                </div>
+
+                                <h4>Prestations sociales</h4>
+
+                                <div class="form-group">
+                                    <label for="allocationsFamiliales">Allocations familiales (€/mois)</label>
+                                    <div class="input-with-currency">
+                                        <input type="number" id="allocationsFamiliales" name="allocationsFamiliales" min="0" value="0">
+                                        <span class="currency">€</span>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="pensionAlimentaire">Pension alimentaire perçue (€/mois)</label>
+                                    <div class="input-with-currency">
+                                        <input type="number" id="pensionAlimentaire" name="pensionAlimentaire" min="0" value="0">
+                                        <span class="currency">€</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="navigation-buttons">
+                                <button class="btn btn-outline-primary" id="prevBtn">Précédent</button>
+                                <button class="btn btn-primary" id="nextBtn" disabled>Suivant</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 9: Charges (vérification des données extraites) -->
+                    <div class="step-content" id="step-charges">
+                        <div class="question-container">
+                            <h2>Vérifiez vos charges</h2>
+                            <p class="extraction-notice">Ces informations ont été extraites de vos relevés bancaires. Veuillez les vérifier et les compléter si nécessaire.</p>
+                            
+                            <div class="form-container">
+                                <h4>Crédits en cours</h4>
+
+                                <div class="form-group">
+                                    <label for="chargesCreditsConsommation">Charges crédits à la consommation (€/mois)</label>
+                                    <div class="input-with-currency">
+                                        <input type="number" id="chargesCreditsConsommation" name="chargesCreditsConsommation" min="0" value="0">
+                                        <span class="currency">€</span>
+                                    </div>
+                                    <small class="form-help">Assurance comprise, prêt revolving si utilisé</small>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="chargesCreditsImmobiliers">Charges crédits immobiliers (€/mois)</label>
+                                    <div class="input-with-currency">
+                                        <input type="number" id="chargesCreditsImmobiliers" name="chargesCreditsImmobiliers" min="0" value="0">
+                                        <span class="currency">€</span>
+                                    </div>
+                                    <small class="form-help">Assurance comprise</small>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="pretsFamiliaux">Prêts familiaux (€/mois)</label>
+                                    <div class="input-with-currency">
+                                        <input type="number" id="pretsFamiliaux" name="pretsFamiliaux" min="0" value="0">
+                                        <span class="currency">€</span>
+                                    </div>
+                                </div>
+
+                                <h4>Autres charges</h4>
+
+                                <div class="form-group">
+                                    <label for="pensionAlimentaireVersee">Pension alimentaire versée (€/mois)</label>
+                                    <div class="input-with-currency">
+                                        <input type="number" id="pensionAlimentaireVersee" name="pensionAlimentaireVersee" min="0" value="0">
+                                        <span class="currency">€</span>
+                                    </div>
+                                    <small class="form-help">Ou prestation compensatoire en rente viagère</small>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="impotRevenu">Impôt sur le revenu (€/mois)</label>
+                                    <div class="input-with-currency">
+                                        <input type="number" id="impotRevenu" name="impotRevenu" min="0" value="0">
+                                        <span class="currency">€</span>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="loyer">Loyer actuel (€/mois)</label>
+                                    <div class="input-with-currency">
+                                        <input type="number" id="loyer" name="loyer" min="0" value="0">
+                                        <span class="currency">€</span>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="chargesCPS">Charges en qualité de CPS (€/mois)</label>
+                                    <div class="input-with-currency">
+                                        <input type="number" id="chargesCPS" name="chargesCPS" min="0" value="0">
+                                        <span class="currency">€</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="navigation-buttons">
+                                <button class="btn btn-outline-primary" id="prevBtn">Précédent</button>
+                                <button class="btn btn-primary" id="nextBtn">Suivant</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 10: Détails du prêt -->
+                    <div class="step-content" id="step-financement">
+                        <div class="question-container">
+                            <h2>Détails de votre financement</h2>
+                            
+                            <div class="form-container">
+                                <div class="form-group">
+                                    <label for="montantProjet">Montant total du projet (€) *</label>
+                                    <div class="input-with-currency">
+                                        <input type="number" id="montantProjet" name="montantProjet" min="0" required>
+                                        <span class="currency">€</span>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="apportPersonnel">Apport personnel (€) *</label>
+                                    <div class="input-with-currency">
+                                        <input type="number" id="apportPersonnel" name="apportPersonnel" min="0" required>
+                                        <span class="currency">€</span>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="montantEmprunte">Montant à emprunter (€)</label>
+                                    <div class="input-with-currency">
+                                        <input type="number" id="montantEmprunte" name="montantEmprunte" readonly>
+                                        <span class="currency">€</span>
+                                    </div>
+                                    <small class="form-help">Calculé automatiquement</small>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="dureeEmprunt">Durée souhaitée du prêt *</label>
+                                    <select id="dureeEmprunt" name="dureeEmprunt" required>
+                                        <option value="">Choisissez...</option>
+                                        <option value="10">10 ans</option>
+                                        <option value="15">15 ans</option>
+                                        <option value="20">20 ans</option>
+                                        <option value="25">25 ans</option>
+                                        <option value="30">30 ans</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="typeAmortissement">Type d'amortissement</label>
+                                    <select id="typeAmortissement" name="typeAmortissement">
+                                        <option value="constant">Amortissement constant</option>
+                                        <option value="in-fine">In fine</option>
+                                        <option value="progressif">Progressif</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="assuranceEmprunteur">Assurance emprunteur souhaitée</label>
+                                    <select id="assuranceEmprunteur" name="assuranceEmprunteur">
+                                        <option value="banque">Assurance de la banque</option>
+                                        <option value="externe">Assurance externe</option>
+                                        <option value="indifferent">Indifférent</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="navigation-buttons">
+                                <button class="btn btn-outline-primary" id="prevBtn">Précédent</button>
+                                <button class="btn btn-primary" id="nextBtn" disabled>Suivant</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 11: Documents du projet -->
+                    <div class="step-content" id="step-documents-projet">
+                        <div class="question-container">
+                            <h2>Documents relatifs à votre projet</h2>
+                            
+                            <div class="document-upload-container">
+                                <div class="document-info">
+                                    <div class="document-icon">
+                                        <i class="fas fa-file-contract"></i>
+                                    </div>
+                                    <div class="document-description">
+                                        <h3>Documents du projet immobilier</h3>
+                                        <p>Téléchargez les documents relatifs à votre projet immobilier.</p>
+                                        <ul class="document-requirements">
+                                            <li><i class="fas fa-check"></i> Compromis de vente</li>
+                                            <li><i class="fas fa-check"></i> Devis de travaux</li>
+                                            <li><i class="fas fa-check"></i> Permis de construire</li>
+                                            <li><i class="fas fa-check"></i> Plans</li>
+                                            <li><i class="fas fa-check"></i> Format PDF uniquement</li>
+                                        </ul>
+                                    </div>
+                                </div>
+
+                                <div class="upload-container">
+                                    <div class="file-upload">
+                                        <input type="file" id="documents-projet" accept=".pdf" multiple>
+                                        <div class="upload-zone">
+                                            <i class="fas fa-cloud-upload-alt"></i>
+                                            <p>Déposez vos documents ici</p>
+                                            <span>ou</span>
+                                            <button type="button" class="btn btn-outline-primary btn-sm">Parcourir</button>
+                                            <span class="file-info">Format accepté: PDF, JPG, PNG</span>
+                                        </div>
+                                    </div>
+                                    <div class="uploaded-files"></div>
+                                </div>
+                            </div>
+
+                            <div class="navigation-buttons">
+                                <button class="btn btn-outline-primary" id="prevBtn">Précédent</button>
+                                <button class="btn btn-primary" id="nextBtn">Soumettre ma demande</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 12: Confirmation -->
+                    <div class="step-content" id="step-confirmation">
+                        <div class="question-container">
+                            <div class="results-container">
+                                <div class="congratulations">
+                                    <i class="fas fa-check-circle"></i>
+                                    <h2>Demande soumise avec succès !</h2>
+                                    <p>Votre dossier complet a été créé et sera traité dans les plus brefs délais</p>
+                                </div>
+
+                                <div class="loan-result">
+                                    <div class="result-card">
+                                        <h3>Numéro de dossier</h3>
+                                        <div class="dossier-number" id="dossierNumber">NL-2024-000000</div>
+                                    </div>
+                                    
+                                    <div class="result-details">
+                                        <div class="detail-item">
+                                            <span class="label">Date de soumission :</span>
+                                            <span class="value" id="submissionDate">-</span>
+                                        </div>
+                                        <div class="detail-item">
+                                            <span class="label">Statut :</span>
+                                            <span class="value status-pending">En cours d'analyse</span>
+                                        </div>
+                                        <div class="detail-item">
+                                            <span class="label">Délai de traitement :</span>
+                                            <span class="value">5-7 jours ouvrés</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="next-steps">
+                                        <h4>Prochaines étapes :</h4>
+                                        <ul>
+                                            <li>Vérification de vos documents</li>
+                                            <li>Analyse complète de votre dossier</li>
+                                            <li>Étude de faisabilité financière</li>
+                                            <li>Recherche des meilleures offres</li>
+                                            <li>Retour par email sous 7 jours</li>
+                                        </ul>
+                                    </div>
+                                </div>
+
+                                <div class="navigation-buttons">
+                                    <button class="btn btn-outline-primary" onclick="window.location.href='/dashboard'">Mon tableau de bord</button>
+                                    <button class="btn btn-primary" onclick="window.location.href='/'">Retour à l'accueil</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/demande.js"></script>
+</body>
+</html>

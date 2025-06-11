@@ -44,9 +44,9 @@ db.once('open',() => {
 
 //session
 app.use(session({
-    secret: 'secret',
+    secret: process.env.SESSION_SECRET,
     resave: false,
-    saveUninitialized: false,
+    saveUninitialized: true,
     store: mongoStore.create({
         mongoUrl: process.env.DATABASE_URL,
         ttl: 60*30

@@ -2,7 +2,10 @@ const crypto = require('crypto')
 
 function checkCsrfToken(req,res,next){
     console.log('\nCheckingCSRFToken')
+    console.log(req.body._csrf,'hello')
     const token = req.body._csrf
+
+    console.log(token,req.session.csrfTokens)
 
     if(token && req.session.csrfTokens && req.session.csrfTokens.includes(token)){
         req.session.csrfTokens = req.session.csrfTokens.filter(t => t!= token)

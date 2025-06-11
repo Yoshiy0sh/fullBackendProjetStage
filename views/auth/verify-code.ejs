@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vérification du code - NexLoan</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="auth-body">
+    <div class="auth-container">
+        <div class="auth-card">
+            <div class="auth-header">
+                <div class="logo">
+                    <i class="fas fa-home logo-icon"></i>
+                    <span class="logo-text">NexLoan</span>
+                </div>
+                <h1>Code de vérification</h1>
+                <p>Un code à 6 chiffres a été envoyé à <strong><%= emailVerifyCode %></strong></p>
+            </div>
+
+            <% if (errorMessage) { %>
+                <div class="error-message">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <%= errorMessage %>
+                </div>
+            <% } %>
+
+            <form class="auth-form" action="/verify-code" method="POST">
+                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                <input type="hidden" name="email" value="<%= emailVerifyCode %>">
+                
+                <div class="form-group">
+                    <label for="code">Code de vérification</label>
+                    <div class="input-wrapper">
+                        <i class="fas fa-key input-icon"></i>
+                        <input type="text" id="code" name="codeVerifyCode" placeholder="123456" required>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-full">
+                    Vérifier le code
+                    <i class="fas fa-arrow-right"></i>
+                </button>
+            </form>
+
+            <div class="resend-section">
+                <p>Vous n'avez pas reçu le code ?</p>
+                <button id="resendBtn" class="btn btn-outline-primary btn-full" disabled>
+                    Renvoyer le code (<span id="countdown">20</span>s)
+                </button>
+            </div>
+
+            <div class="auth-footer">
+                <a href="/forgot-password" class="back-home">
+                    <i class="fas fa-arrow-left"></i>
+                    Retour
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Fonction pour gérer le compte à rebours et le bouton de renvoi
+        function startCountdown() {
+            let countdown = 20;
+            const resendBtn = document.getElementById('resendBtn');
+            const countdownSpan = document.getElementById('countdown');
+            
+            // Désactiver le bouton et afficher le compte à rebours
+            resendBtn.disabled = true;
+            resendBtn.innerHTML = `Renvoyer le code (<span id="countdown">${countdown}</span>s)`;
+            
+            // Référence au span de compte à rebours (qui vient d'être recréé)
+            const newCountdownSpan = resendBtn.querySelector('#countdown');
+            
+            // Démarrer le compte à rebours
+            const timer = setInterval(() => {
+                countdown--;
+                newCountdownSpan.textContent = countdown;
+                
+                if (countdown <= 0) {
+                    clearInterval(timer);
+                    resendBtn.disabled = false;
+                    resendBtn.innerHTML = 'Renvoyer le code <i class="fas fa-redo"></i>';
+                }
+            }, 1000);
+            
+            return timer;
+        }
+
+        // Démarrer le compte à rebours initial
+        let currentTimer = startCountdown();
+
+        // Gérer le clic sur le bouton de renvoi
+        document.getElementById('resendBtn').addEventListener('click', async function() {
+            if (this.disabled) return;
+            
+            try {
+                const response = await fetch('/resend-code', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ 
+                        email: '<%= emailVerifyCode %>',
+                        _csrf: '<%= csrfToken %>'
+                    })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    // Met à jour le token CSRF dans le DOM
+                    if (data.csrfToken) {
+                        document.querySelector('input[name="_csrf"]').value = data.csrfToken;
+                    }
+                    
+                    // Effacer le timer précédent si nécessaire
+                    if (currentTimer) {
+                        clearInterval(currentTimer);
+                    }
+                    
+                    // Redémarrer un nouveau compte à rebours
+                    currentTimer = startCountdown();
+
+                    // Afficher un message de succès
+                    const successDiv = document.createElement('div');
+                    successDiv.className = 'success-message';
+                    successDiv.innerHTML = '<i class="fas fa-check-circle"></i> Code renvoyé avec succès !';
+                    document.querySelector('.auth-header').after(successDiv);
+                    
+                    // Supprimer le message après 3 secondes
+                    setTimeout(() => {
+                        if (successDiv.parentNode) {
+                            successDiv.remove();
+                        }
+                    }, 3000);
+                } else {
+                    // Gérer les erreurs de l'API
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'Erreur lors du renvoi du code');
+                }
+            } catch (error) {
+                console.error('Erreur lors du renvoi du code:', error);
+                
+                // Afficher un message d'erreur
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'error-message';
+                errorDiv.innerHTML = `<i class="fas fa-exclamation-circle"></i> ${error.message || 'Erreur lors du renvoi du code'}`;
+                document.querySelector('.auth-header').after(errorDiv);
+                
+                // Supprimer le message après 3 secondes
+                setTimeout(() => {
+                    if (errorDiv.parentNode) {
+                        errorDiv.remove();
+                    }
+                }, 3000);
+            }
+        });
+
+        // Auto-focus et format code input
+        // const codeInput = document.getElementById('code');
+        // codeInput.addEventListener('input', (e) => {
+        //     e.target.value = e.target.value.replace(/\D/g, '');
+        // });
+        
+        // Focus automatique sur le champ de code
+        window.addEventListener('load', () => {
+            codeInput.focus();
+        });
+    </script>
+</body>
+</html>

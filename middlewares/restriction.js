@@ -3,12 +3,12 @@ const User = require('../models/user')
 async function restrictApplicant(req,res,next){
     try {
         if(req.session && req.session.userId){
-            if(req.session.usertype == 'applicant'){
+            if(req.session.usertype === 'applicant'){
                 return next()
             }
         }
 
-        console.log('Access denied')
+        console.log('Access denied ( applicant only )')
         req.session.errorMessage = "Access denied ( applicant only )"
         res.status(401).redirect('/')
     } catch (error) {

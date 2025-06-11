@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation Header -->
+    <header class="header">
+        <div class="container">
+            <div class="nav-wrapper">
+                <div class="logo">
+                    <i class="fas fa-home logo-icon"></i>
+                    <span class="logo-text">NexLoan</span>
+                </div>
+
+                <nav class="nav-menu">
+                    <ul>
+                        <li><a href="/">Accueil</a></li>
+                        <li><a href="/dashboard" class="<%= currentPage === 'dashboard' ? 'active' : '' %>">Tableau de bord</a></li>
+                        <li><a href="/dashboard/documents" class="<%= currentPage === 'documents' ? 'active' : '' %>">Mes Documents</a></li>
+                        <li><a href="/applicant/demande" class="<%= currentPage === 'demandes' ? 'active' : '' %>">Mes Demandes</a></li>
+                        <li><a href="/#contact">Contact</a></li>
+                    </ul>
+                </nav>
+
+                <div class="header-buttons">
+                    <div class="user-menu">
+                        <button class="user-menu-toggle" onclick="toggleUserMenu()">
+                            <i class="fas fa-user-circle"></i>
+                            <span><%= firstNameDashboard %></span>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="user-dropdown" id="userDropdown">
+                            <a href="/profile" class="dropdown-item">
+                                <i class="fas fa-user"></i>
+                                Mon Profil
+                            </a>
+                            <a href="/dashboard/documents" class="dropdown-item">
+                                <i class="fas fa-file-alt"></i>
+                                Mes Documents
+                            </a>
+                            <div class="dropdown-divider"></div>
+                            <form action="/logout" method="POST" style="margin: 0;">
+                                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                                <button type="submit" class="dropdown-item logout-btn">
+                                    <i class="fas fa-sign-out-alt"></i>
+                                    Déconnexion
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Dashboard Content -->
+    <main class="dashboard-main">
+        <div class="container">
+            <div class="dashboard-header">
+                <h1>Tableau de bord</h1>
+                <p>Bienvenue <%= firstNameDashboard %> <%= lastNameDashboard %></p>
+            </div>
+
+            <div class="dashboard-grid">
+                <div class="dashboard-card">
+                    <div class="card-icon">
+                        <i class="fas fa-calculator"></i>
+                    </div>
+                    <h3>Simulation de Prêt</h3>
+                    <p>Calculez votre capacité d'emprunt</p>
+                    <a href="/simulation" class="btn btn-primary">Commencer</a>
+                </div>
+
+                <div class="dashboard-card">
+                    <div class="card-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h3>Simulation de Renégociation</h3>
+                    <p>Évaluez les économies possibles</p>
+                    <a href="/simulation-renegociation" class="btn btn-primary">Simuler</a>
+                </div>
+
+                <div class="dashboard-card">
+                    <div class="card-icon">
+                        <i class="fas fa-file-contract"></i>
+                    </div>
+                    <h3>Demande de Prêt</h3>
+                    <p>Constituez votre dossier complet</p>
+                    <a href="/applicant/demande" class="btn btn-outline-primary">Faire une demande</a>
+                </div>
+
+                <div class="dashboard-card">
+                    <div class="card-icon">
+                        <i class="fas fa-handshake"></i>
+                    </div>
+                    <h3>Renégociation de Prêt</h3>
+                    <p>Renégociez votre prêt existant</p>
+                    <a href="/renegociation" class="btn btn-outline-primary">Renégocier</a>
+                </div>
+
+                <div class="dashboard-card">
+                    <div class="card-icon">
+                        <i class="fas fa-file-alt"></i>
+                    </div>
+                    <h3>Mes Documents</h3>
+                    <p>Gérez vos documents personnels</p>
+                    <a href="/dashboard/documents" class="btn btn-outline-primary">Voir mes documents</a>
+                </div>
+
+                <div class="dashboard-card">
+                    <div class="card-icon">
+                        <i class="fas fa-user-cog"></i>
+                    </div>
+                    <h3>Mon Profil</h3>
+                    <p>Modifiez vos informations personnelles</p>
+                    <a href="/profile" class="btn btn-outline-primary">Gérer mon profil</a>
+                </div>
+            </div>
+        </div>
+    </main>
+</body>
+<script>
+function toggleUserMenu() {
+    const dropdown = document.getElementById('userDropdown');
+    dropdown.classList.toggle('show');
+}
+
+window.onclick = function(event) {
+    if (!event.target.matches('.user-menu-toggle') && !event.target.closest('.user-menu-toggle')) {
+        const dropdown = document.getElementById('userDropdown');
+        if (dropdown.classList.contains('show')) {
+            dropdown.classList.remove('show');
+        }
+    }
+}
+</script>
+</html>

@@ -1,5 +1,4 @@
 function checkBasicSessionFields(req,res,next){
-    console.log('checking basic fields')
     fields = ['errorMessage','successMessage']
     if(req.session){
         fields.forEach(field => {

@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= article.title %> - NexLoan</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation Header -->
+    <header class="header">
+        <div class="container">
+            <div class="nav-wrapper">
+                <!-- Logo -->
+                <div class="logo">
+                    <i class="fas fa-home logo-icon"></i>
+                    <span class="logo-text">NexLoan</span>
+                </div>
+
+                <!-- Navigation Menu -->
+                <nav class="nav-menu">
+                    <ul>
+                        <li><a href="/#services">Prêt Immobilier</a></li>
+                        <li><a href="/#services">Renégociation de Prêt</a></li>
+                        <li><a href="/#blog">Blog</a></li>
+                        <li><a href="/#avis-clients">Avis Clients</a></li>
+                        <li><a href="/#contact">Contact</a></li>
+                    </ul>
+                </nav>
+
+                <!-- CTA and Login Buttons -->
+                <div class="header-buttons">
+                    <% if (isConnected) { %>
+                        <span class="user-welcome">Bonjour, <%= firstNameArticle %></span>
+                        <a href="/dashboard" class="btn btn-primary">Tableau de bord</a>
+                        <form action="/logout" method="POST" style="display: inline;">
+                            <button type="submit" class="btn btn-outline-primary">Déconnexion</button>
+                        </form>
+                    <% } else { %>
+                        <a href="/simulation" class="btn btn-primary">Simuler un Prêt</a>
+                        <a href="/login" class="btn btn-outline-primary">Connectez-vous</a>
+                    <% } %>
+                </div>
+
+                <!-- Mobile Menu Button -->
+                <div class="mobile-menu-btn">
+                    <i class="fas fa-bars"></i>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Article Content -->
+    <main class="article-main">
+        <div class="container">
+            <!-- Breadcrumb -->
+            <nav class="breadcrumb">
+                <a href="/">Accueil</a>
+                <i class="fas fa-chevron-right"></i>
+                <a href="/#blog">Blog</a>
+                <i class="fas fa-chevron-right"></i>
+                <span><%= article.title %></span>
+            </nav>
+
+            <!-- Article Header -->
+            <header class="article-header">
+                <div class="article-meta">
+                    <span class="article-category"><%= article.category %></span>
+                    <span class="article-date">
+                        <i class="fas fa-calendar"></i>
+                        <%= article.date %>
+                    </span>
+                    <span class="reading-time">
+                        <i class="fas fa-clock"></i>
+                        <%= article.readingTime %> min de lecture
+                    </span>
+                </div>
+                <h1 class="article-title"><%= article.title %></h1>
+                <p class="article-excerpt"><%= article.excerpt %></p>
+                <div class="article-author">
+                    <div class="author-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="author-info">
+                        <div class="author-name"><%= article.author.name %></div>
+                        <div class="author-role"><%= article.author.role %></div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Article Image -->
+            <div class="article-image">
+                <div class="article-placeholder">
+                    <i class="<%= article.icon %>"></i>
+                </div>
+            </div>
+
+            <!-- Article Content -->
+            <article class="article-content">
+                <div class="article-body">
+                    <%- article.content %>
+                </div>
+
+                <!-- Article Tags -->
+                <div class="article-tags">
+                    <h4>Tags :</h4>
+                    <div class="tags-list">
+                        <% article.tags.forEach(function(tag) { %>
+                            <span class="tag">#<%= tag %></span>
+                        <% }); %>
+                    </div>
+                </div>
+
+                <!-- Share Section -->
+                <div class="article-share">
+                    <h4>Partager cet article :</h4>
+                    <div class="share-buttons">
+                        <a href="#" class="share-btn facebook">
+                            <i class="fab fa-facebook-f"></i>
+                            Facebook
+                        </a>
+                        <a href="#" class="share-btn twitter">
+                            <i class="fab fa-twitter"></i>
+                            Twitter
+                        </a>
+                        <a href="#" class="share-btn linkedin">
+                            <i class="fab fa-linkedin-in"></i>
+                            LinkedIn
+                        </a>
+                        <a href="#" class="share-btn email">
+                            <i class="fas fa-envelope"></i>
+                            Email
+                        </a>
+                    </div>
+                </div>
+            </article>
+
+            <!-- CTA Section -->
+            <section class="article-cta">
+                <div class="cta-content">
+                    <h3>Prêt à commencer votre projet immobilier ?</h3>
+                    <p>Nos experts sont là pour vous accompagner dans toutes vos démarches</p>
+                    <div class="cta-buttons">
+                        <a href="/simulation" class="btn btn-primary">
+                            Simuler mon prêt
+                            <i class="fas fa-chevron-right"></i>
+                        </a>
+                        <a href="/#contact" class="btn btn-outline-primary">Nous contacter</a>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer" id="contact">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <div class="footer-logo">
+                        <i class="fas fa-home logo-icon"></i>
+                        <span class="logo-text">NexLoan</span>
+                    </div>
+                    <p>Votre partenaire de confiance pour tous vos projets immobiliers</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-linkedin"></i></a>
+                    </div>
+                </div>
+
+                <div class="footer-section">
+                    <h3>Services</h3>
+                    <ul>
+                        <li><a href="#services">Prêt Immobilier</a></li>
+                        <li><a href="#services">Renégociation</a></li>
+                        <li><a href="#blog">Blog</a></li>
+                        <li><a href="/login">Espace Client</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-section">
+                    <h3>Ressources</h3>
+                    <ul>
+                        <li><a href="#blog">Blog</a></li>
+                        <li><a href="#">Guides</a></li>
+                        <li><a href="#">FAQ</a></li>
+                        <li><a href="#">Calculateurs</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-section">
+                    <h3>Contact</h3>
+                    <ul class="contact-info">
+                        <li><i class="fas fa-phone"></i> 01 23 45 67 89</li>
+                        <li><i class="fas fa-envelope"></i> contact@nexloan.fr</li>
+                        <li><i class="fas fa-map-marker-alt"></i> 123 Rue de la Finance</li>
+                        <li>75001 Paris</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <p>&copy; 2024 NexLoan. Tous droits réservés.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="/js/script.js"></script>
+</body>
+</html>

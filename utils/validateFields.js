@@ -39,7 +39,6 @@ function pushBodyToSessionFields(req,res,fields){
             }
         }
     }
-    console.log('on a trouvé le mdp ' + req.session.formFields.password)
     res.status(400).redirect(req.get('Referrer'))
 }
 

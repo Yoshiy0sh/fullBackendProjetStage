@@ -1,0 +1,32 @@
+<form id="resetForm" method="POST" action="/reset-password/send-code">
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+    <label for="email">Votre email :</label>
+    <input type="email" name="email" id="email" required>
+    <button type="submit" id="sendMailBtn">Envoyer mail</button>
+</form>
+
+<div id="codeSection" style="display:none;">
+    <form id="codeForm" method="POST" action="/reset-password/verify-code">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+        <label for="code">Code reçu :</label>
+        <input type="text" name="code" id="code" required>
+        <button type="submit">Vérifier le code</button>
+    </form>
+</div>
+
+<script>
+    document.getElementById('resetForm').onsubmit = async function(e) {
+        e.preventDefault();
+        const form = e.target;
+        const res = await fetch(form.action, {
+            method: 'POST',
+            body: new FormData(form)
+        });
+        if (res.ok) {
+            console.log('pass')
+            const data = await res.json()
+            document.querySelector('#codeForm input[name="_csrf"]').value = data.csrfToken;
+            document.getElementById('codeSection').style.display = '';
+        }
+    };
+</script>

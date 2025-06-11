@@ -1,13 +1,376 @@
-Index page
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NexLoan - Simplifiez vos démarches de financement</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation Header -->
+    <header class="header">
+        <div class="container">
+            <div class="nav-wrapper">
+                <!-- Logo -->
+                <div class="logo">
+                    <i class="fas fa-home logo-icon"></i>
+                    <span class="logo-text">NexLoan</span>
+                </div>
 
-<% if(isConnected){ %>
-    <label>Connected</label>
-<% } %>
+                <!-- Navigation Menu -->
+                <nav class="nav-menu">
+                    <ul>
+                        <li><a href="#services">Prêt Immobilier</a></li>
+                        <li><a href="#services">Renégociation de Prêt</a></li>
+                        <li><a href="#blog">Blog</a></li>
+                        <li><a href="#avis-clients">Avis Clients</a></li>
+                        <li><a href="#contact">Contact</a></li>
+                    </ul>
+                </nav>
 
-<% if(errorMessage){ %>
-    <label><%=errorMessage%></label>
-<% } %>
+                <!-- CTA and Login Buttons -->
+                <div class="header-buttons">
+                    <% if (isConnected) { %>
+                        <span class="user-welcome">Bonjour, <%= firstNameIndex %></span>
+                        <a href="applicant/dashboard" class="btn btn-primary">Tableau de bord</a>
+                        <form action="/logout" method="POST" style="display: inline;">
+                            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                            <button type="submit" class="btn btn-outline-primary">Déconnexion</button>
+                        </form>
+                    <% } else { %>
+                        <a href="applicant/simulation" class="btn btn-primary">Simuler un Prêt</a>
+                        <a href="/login" class="btn btn-outline-primary">Connectez-vous</a>
+                    <% } %>
+                </div>
 
-<a href="/login">login</a>
-<a href="/register">register</a>
-<a href="/edit">edit account</a>
+                <!-- Mobile Menu Button -->
+                <div class="mobile-menu-btn">
+                    <i class="fas fa-bars"></i>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <div class="hero-text">
+                    <h1>Simplifiez vos démarches de financement</h1>
+                    <p>Obtenez les meilleures conditions pour votre prêt immobilier ou renégociez votre crédit existant sans intermédiaire.</p>
+                    <div class="hero-buttons">
+                        <a href="/simulation" class="btn btn-primary btn-large">
+                            Simuler mon prêt
+                            <i class="fas fa-chevron-right"></i>
+                        </a>
+                        <a href="#services" class="btn btn-outline-primary btn-large">En savoir plus</a>
+                    </div>
+                </div>
+                <div class="hero-image">
+                    <div class="hero-placeholder">
+                        <i class="fas fa-home hero-icon"></i>
+                        <div class="percentage-badge">%</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Key Features Section -->
+    <section class="features" id="services">
+        <div class="container">
+            <div class="section-header">
+                <h2>Nos services financiers</h2>
+                <p>Découvrez nos solutions adaptées à vos besoins financiers</p>
+            </div>
+
+            <div class="features-grid">
+                <!-- Simulation de Prêt -->
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-calculator"></i>
+                    </div>
+                    <h3>Simulation de Prêt</h3>
+                    <p>Calculez votre capacité d'emprunt et découvrez les meilleures offres adaptées à votre profil en quelques clics.</p>
+                    <a href="/simulation" class="btn btn-outline-primary">
+                        Simuler maintenant
+                        <i class="fas fa-chevron-right"></i>
+                    </a>
+                </div>
+
+                <!-- Demande de Prêt -->
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-file-text"></i>
+                    </div>
+                    <h3>Demande de Prêt</h3>
+                    <p>Constituez votre dossier en ligne et bénéficiez d'un accompagnement personnalisé tout au long du processus.</p>
+                    <a href="/demande" class="btn btn-outline-primary">
+                        Faire une demande
+                        <i class="fas fa-chevron-right"></i>
+                    </a>
+                </div>
+
+                <!-- Renégociation de Prêt -->
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-sync-alt"></i>
+                    </div>
+                    <h3>Renégociation de Prêt</h3>
+                    <p>Réduisez vos mensualités ou la durée de votre prêt grâce à nos experts en renégociation immobilière.</p>
+                    <% if (isConnected) { %>
+                        <a href="/renegociation" class="btn btn-outline-primary">
+                            Renégocier
+                            <i class="fas fa-chevron-right"></i>
+                        </a>
+                    <% } else { %>
+                        <a href="/login?redirect=/renegociation" class="btn btn-outline-primary">
+                            Renégocier
+                            <i class="fas fa-chevron-right"></i>
+                        </a>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section - Demande de Prêt -->
+    <section class="cta-section" id="cta-section">
+        <div class="container">
+            <div class="cta-content">
+                <h2>Prêt à commencer votre projet ?</h2>
+                <p>Simulez votre prêt en quelques minutes et obtenez une réponse rapide</p>
+                <div class="cta-buttons">
+                    <a href="/simulation" class="btn btn-cta-primary">
+                        Simuler mon prêt
+                        <i class="fas fa-chevron-right"></i>
+                    </a>
+                    <a href="#contact" class="btn btn-cta-outline">Nous contacter</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Client Reviews Section -->
+    <section class="reviews" id="avis-clients">
+        <div class="container">
+            <div class="section-header">
+                <h2>Avis de nos clients</h2>
+                <p>Découvrez ce que nos clients pensent de nos services</p>
+            </div>
+
+            <div class="reviews-grid">
+                <% 
+                const reviews = [
+                    {
+                        name: "Marie Dubois",
+                        role: "Propriétaire",
+                        content: "Service exceptionnel ! J'ai économisé plus de 15 000€ grâce à la renégociation de mon prêt.",
+                        rating: 5
+                    },
+                    {
+                        name: "Pierre Martin",
+                        role: "Primo-accédant",
+                        content: "Accompagnement parfait pour mon premier achat. Équipe très professionnelle et réactive.",
+                        rating: 5
+                    },
+                    {
+                        name: "Sophie Laurent",
+                        role: "Investisseur",
+                        content: "Simulation précise et conseils avisés. Je recommande vivement leurs services.",
+                        rating: 5
+                    }
+                ];
+                %>
+
+                <% reviews.forEach(function(review) { %>
+                <div class="review-card">
+                    <div class="stars">
+                        <% for(let i = 0; i < review.rating; i++) { %>
+                            <i class="fas fa-star"></i>
+                        <% } %>
+                    </div>
+                    <p class="review-content">"<%= review.content %>"</p>
+                    <div class="reviewer">
+                        <div class="reviewer-avatar">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <div class="reviewer-info">
+                            <div class="reviewer-name"><%= review.name %></div>
+                            <div class="reviewer-role"><%= review.role %></div>
+                        </div>
+                    </div>
+                </div>
+                <% }); %>
+            </div>
+        </div>
+    </section>
+
+    <!-- Blog Section -->
+    <section class="blog" id="blog">
+        <div class="container">
+            <div class="section-header">
+                <h2>Actualités et conseils</h2>
+                <p>Restez informé des dernières tendances du marché immobilier</p>
+            </div>
+
+            <div class="blog-grid">
+                <% 
+                const articles = [
+                    {
+                        id: "taux-immobiliers-2024",
+                        title: "Taux immobiliers : que prévoir pour 2024 ?",
+                        excerpt: "Analyse des tendances du marché et prévisions pour les mois à venir...",
+                        date: "15 Mars 2024",
+                        category: "Marché"
+                    },
+                    {
+                        id: "guide-renegociation-pret",
+                        title: "Guide complet de la renégociation de prêt",
+                        excerpt: "Tous nos conseils pour réussir la renégociation de votre crédit immobilier...",
+                        date: "12 Mars 2024",
+                        category: "Conseils"
+                    },
+                    {
+                        id: "primo-accedants-aides",
+                        title: "Primo-accédants : les aides disponibles",
+                        excerpt: "Découvrez toutes les aides financières pour votre premier achat immobilier...",
+                        date: "10 Mars 2024",
+                        category: "Aides"
+                    }
+                ];
+                %>
+
+                <% articles.forEach(function(article) { %>
+                <article class="blog-card">
+                    <div class="blog-image"></div>
+                    <div class="blog-content">
+                        <div class="blog-meta">
+                            <span class="blog-category"><%= article.category %></span>
+                            <span class="blog-date">
+                                <i class="fas fa-calendar"></i>
+                                <%= article.date %>
+                            </span>
+                        </div>
+                        <h3><%= article.title %></h3>
+                        <p><%= article.excerpt %></p>
+                        <a href="/blog/<%= article.id %>" class="read-more">
+                            Lire la suite
+                            <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </article>
+                <% }); %>
+            </div>
+        </div>
+    </section>
+
+    <!-- Financial Entities Section -->
+    <section class="financial-entities-cta" id="financial-entities">
+        <div class="container">
+            <div class="financial-entities-content">
+                <div class="financial-entities-text">
+                    <div class="financial-entities-icon">
+                        <i class="fas fa-building"></i>
+                    </div>
+                    <h2>Vous êtes une entité financière ?</h2>
+                    <p>Rejoignez notre réseau de partenaires et accédez à une plateforme dédiée pour optimiser la gestion de vos dossiers de prêt immobilier.</p>
+                    <div class="financial-benefits">
+                        <div class="benefit-item">
+                            <i class="fas fa-users"></i>
+                            <span>Flux de clients qualifiés</span>
+                        </div>
+                        <div class="benefit-item">
+                            <i class="fas fa-cogs"></i>
+                            <span>Outils de gestion avancés</span>
+                        </div>
+                        <div class="benefit-item">
+                            <i class="fas fa-chart-line"></i>
+                            <span>Analytics & Reporting</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="financial-entities-cta-buttons">
+                    <a href="/LoanOfficer" class="btn btn-financial-primary">
+                        <i class="fas fa-building"></i>
+                        Espace des entités financières
+                    </a>
+                    <p class="financial-entities-subtitle">Banques • Courtiers • Organismes de crédit</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Newsletter Section -->
+    <section class="newsletter">
+        <div class="container">
+            <div class="newsletter-content">
+                <h2>Restez informé de nos dernières offres</h2>
+                <p>Recevez nos conseils d'experts et les meilleures opportunités directement dans votre boîte mail</p>
+                <form class="newsletter-form">
+                    <input type="email" placeholder="Votre adresse email" required>
+                    <button type="submit" class="btn btn-primary">S'abonner</button>
+                </form>
+                <p class="newsletter-disclaimer">Pas de spam, désinscription possible à tout moment</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer" id="contact">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <div class="footer-logo">
+                        <i class="fas fa-home logo-icon"></i>
+                        <span class="logo-text">NexLoan</span>
+                    </div>
+                    <p>Votre partenaire de confiance pour tous vos projets immobiliers</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-linkedin"></i></a>
+                    </div>
+                </div>
+
+                <div class="footer-section">
+                    <h3>Services</h3>
+                    <ul>
+                        <li><a href="#services">Prêt Immobilier</a></li>
+                        <li><a href="#services">Renégociation</a></li>
+                        <li><a href="#blog">Blog</a></li>
+                        <li><a href="/login">Espace Client</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-section">
+                    <h3>Ressources</h3>
+                    <ul>
+                        <li><a href="#blog">Blog</a></li>
+                        <li><a href="#">Guides</a></li>
+                        <li><a href="#">FAQ</a></li>
+                        <li><a href="#">Calculateurs</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-section">
+                    <h3>Contact</h3>
+                    <ul class="contact-info">
+                        <li><i class="fas fa-phone"></i> 01 23 45 67 89</li>
+                        <li><i class="fas fa-envelope"></i> contact@nexloan.fr</li>
+                        <li><i class="fas fa-map-marker-alt"></i> 123 Rue de la Finance</li>
+                        <li>75001 Paris</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <p>&copy; 2024 NexLoan. Tous droits réservés.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="/js/script.js"></script>
+</body>
+</html>

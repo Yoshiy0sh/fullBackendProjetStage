@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Demande de Prêt - NexLoan</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="simulation-body">
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+    <!-- Navigation Header -->
+    <header class="header">
+        <div class="container">
+            <div class="nav-wrapper">
+                <!-- Logo -->
+                <div class="logo">
+                    <i class="fas fa-home logo-icon"></i>
+                    <span class="logo-text">NexLoan</span>
+                </div>
+
+                <!-- Navigation Menu -->
+                <nav class="nav-menu">
+                    <ul>
+                        <li><a href="/#services">Prêt Immobilier</a></li>
+                        <li><a href="/#services">Renégociation de Prêt</a></li>
+                        <li><a href="/#blog">Blog</a></li>
+                        <li><a href="/#avis-clients">Avis Clients</a></li>
+                        <li><a href="/#contact">Contact</a></li>
+                    </ul>
+                </nav>
+
+                <!-- CTA and Login Buttons -->
+                <div class="header-buttons">
+                    <span class="user-welcome">Bonjour, <%= firstNameLoan %></span>
+                    <a href="/dashboard" class="btn btn-primary">Tableau de bord</a>
+                    <form action="/logout" method="POST" style="display: inline;">
+                        <input type="hidden" name="_csrf" value="<% csrfToken %>">
+                        <button type="submit" class="btn btn-outline-primary">Déconnexion</button>
+                    </form>
+                </div>
+
+                <!-- Mobile Menu Button -->
+                <div class="mobile-menu-btn">
+                    <i class="fas fa-bars"></i>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Demande Modal -->
+    <div class="simulation-overlay">
+        <div class="simulation-modal">
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <button class="back-btn" onclick="history.back()">
+                    <i class="fas fa-arrow-left"></i>
+                    Retour
+                </button>
+                <h1>Demande de Prêt</h1>
+                <button class="close-btn" onclick="window.location.href='/'">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <!-- Modal Content -->
+            <div class="modal-content">
+                <!-- Sidebar Navigation -->
+                <div class="simulation-sidebar">
+                    <div class="step-section">
+                        <h3>Introduction</h3>
+                        <div class="step-item completed">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Introduction</span>
+                        </div>
+                    </div>
+
+                    <div class="step-section">
+                        <h3>Vos informations</h3>
+                        <div class="step-item active">
+                            <i class="fas fa-circle"></i>
+                            <span>Votre projet</span>
+                        </div>
+                        <div class="step-item disabled">
+                            <i class="fas fa-circle"></i>
+                            <span>Vos informations</span>
+                        </div>
+                    </div>
+
+                    <div class="step-section">
+                        <h3>Votre situation</h3>
+                        <div class="step-item disabled">
+                            <i class="fas fa-circle"></i>
+                            <span>Votre situation</span>
+                        </div>
+                        <div class="step-item disabled">
+                            <i class="fas fa-circle"></i>
+                            <span>Votre situation pro</span>
+                        </div>
+                    </div>
+
+                    <div class="step-section">
+                        <h3>Vos finances</h3>
+                        <div class="step-item disabled">
+                            <i class="fas fa-circle"></i>
+                            <span>Vos finances</span>
+                        </div>
+                    </div>
+
+                    <div class="step-section">
+                        <h3>Documents</h3>
+                        <div class="step-item disabled">
+                            <i class="fas fa-circle"></i>
+                            <span>Pièces justificatives</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Main Content -->
+                <div class="simulation-main">
+                    <!-- Step 1: Votre projet -->
+                    <div class="step-content active" id="step-projet">
+                        <div class="question-container">
+                            <h2>Vous souhaitez faire un achat immobilier</h2>
+                            
+                            <div class="options-grid">
+                                <button class="option-card" data-option="seul">
+                                    <span>seul</span>
+                                </button>
+                                <button class="option-card" data-option="couple">
+                                    <span>à deux</span>
+                                </button>
+                                <button class="option-card" data-option="sci">
+                                    <span>en SCI</span>
+                                </button>
+                            </div>
+
+                            <div class="navigation-buttons">
+                                <button class="btn btn-outline-primary" onclick="history.back()">Précédent</button>
+                                <button class="btn btn-primary" id="nextBtn" disabled>Suivant</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 2: Vos informations -->
+                    <div class="step-content" id="step-informations">
+                        <div class="question-container">
+                            <h2>Quel est votre âge ?</h2>
+                            
+                            <div class="form-container">
+                                <div class="form-group">
+                                    <label for="age">Votre âge</label>
+                                    <input type="number" id="age" min="18" max="80" placeholder="Ex: 35">
+                                </div>
+                                <div class="form-group">
+                                    <label for="situation">Situation familiale</label>
+                                    <select id="situation">
+                                        <option value="">Choisissez...</option>
+                                        <option value="celibataire">Célibataire</option>
+                                        <option value="marie">Marié(e)</option>
+                                        <option value="pacs">Pacsé(e)</option>
+                                        <option value="divorce">Divorcé(e)</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="navigation-buttons">
+                                <button class="btn btn-outline-primary" id="prevBtn">Précédent</button>
+                                <button class="btn btn-primary" id="nextBtn" disabled>Suivant</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 3: Votre situation -->
+                    <div class="step-content" id="step-situation">
+                        <div class="question-container">
+                            <h2>Quelle est votre situation professionnelle ?</h2>
+                            
+                            <div class="options-grid">
+                                <button class="option-card" data-option="cdi">
+                                    <i class="fas fa-briefcase"></i>
+                                    <span>CDI</span>
+                                </button>
+                                <button class="option-card" data-option="cdd">
+                                    <i class="fas fa-clock"></i>
+                                    <span>CDD</span>
+                                </button>
+                                <button class="option-card" data-option="freelance">
+                                    <i class="fas fa-laptop"></i>
+                                    <span>Freelance</span>
+                                </button>
+                                <button class="option-card" data-option="fonctionnaire">
+                                    <i class="fas fa-university"></i>
+                                    <span>Fonctionnaire</span>
+                                </button>
+                            </div>
+
+                            <div class="navigation-buttons">
+                                <button class="btn btn-outline-primary" id="prevBtn">Précédent</button>
+                                <button class="btn btn-primary" id="nextBtn" disabled>Suivant</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 4: Votre situation pro -->
+                    <div class="step-content" id="step-situation-pro">
+                        <div class="question-container">
+                            <h2>Quels sont vos revenus mensuels nets ?</h2>
+                            
+                            <div class="form-container">
+                                <div class="form-group">
+                                    <label for="revenus">Revenus mensuels nets</label>
+                                    <div class="input-with-currency">
+                                        <input type="number" id="revenus" min="1000" placeholder="Ex: 3500">
+                                        <span class="currency">€</span>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="charges">Charges mensuelles</label>
+                                    <div class="input-with-currency">
+                                        <input type="number" id="charges" min="0" placeholder="Ex: 800">
+                                        <span class="currency">€</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="navigation-buttons">
+                                <button class="btn btn-outline-primary" id="prevBtn">Précédent</button>
+                                <button class="btn btn-primary" id="nextBtn" disabled>Suivant</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 5: Vos finances -->
+                    <div class="step-content" id="step-finances">
+                        <div class="question-container">
+                            <h2>Quel est votre apport personnel ?</h2>
+                            
+                            <div class="form-container">
+                                <div class="form-group">
+                                    <label for="apport">Apport personnel</label>
+                                    <div class="input-with-currency">
+                                        <input type="number" id="apport" min="0" placeholder="Ex: 50000">
+                                        <span class="currency">€</span>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="duree">Durée souhaitée du prêt</label>
+                                    <select id="duree">
+                                        <option value="">Choisissez...</option>
+                                        <option value="15">15 ans</option>
+                                        <option value="20">20 ans</option>
+                                        <option value="25">25 ans</option>
+                                        <option value="30">30 ans</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="navigation-buttons">
+                                <button class="btn btn-outline-primary" id="prevBtn">Précédent</button>
+                                <button class="btn btn-primary" id="nextBtn" disabled>Suivant</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 6: Documents -->
+                    <div class="step-content" id="step-documents">
+                        <div class="question-container">
+                            <h2>Téléchargez vos pièces justificatives</h2>
+                            
+                            <div class="documents-container">
+                                <div class="document-upload">
+                                    <div class="upload-item">
+                                        <label for="bulletins-salaire">Bulletins de salaire (3 derniers mois)</label>
+                                        <div class="file-upload">
+                                            <input type="file" id="bulletins-salaire" accept=".pdf" multiple>
+                                            <div class="upload-zone">
+                                                <i class="fas fa-cloud-upload-alt"></i>
+                                                <p>Cliquez pour sélectionner vos fichiers PDF</p>
+                                                <span class="file-info">Format accepté: PDF uniquement</span>
+                                            </div>
+                                        </div>
+                                        <div class="uploaded-files" id="files-bulletins"></div>
+                                    </div>
+
+                                    <div class="upload-item">
+                                        <label for="avis-imposition">Avis d'imposition (2 dernières années)</label>
+                                        <div class="file-upload">
+                                            <input type="file" id="avis-imposition" accept=".pdf" multiple>
+                                            <div class="upload-zone">
+                                                <i class="fas fa-cloud-upload-alt"></i>
+                                                <p>Cliquez pour sélectionner vos fichiers PDF</p>
+                                                <span class="file-info">Format accepté: PDF uniquement</span>
+                                            </div>
+                                        </div>
+                                        <div class="uploaded-files" id="files-avis"></div>
+                                    </div>
+
+                                    <div class="upload-item">
+                                        <label for="justificatifs-revenus">Justificatifs de revenus complémentaires</label>
+                                        <div class="file-upload">
+                                            <input type="file" id="justificatifs-revenus" accept=".pdf" multiple>
+                                            <div class="upload-zone">
+                                                <i class="fas fa-cloud-upload-alt"></i>
+                                                <p>Cliquez pour sélectionner vos fichiers PDF</p>
+                                                <span class="file-info">Format accepté: PDF uniquement (optionnel)</span>
+                                            </div>
+                                        </div>
+                                        <div class="uploaded-files" id="files-revenus"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="navigation-buttons">
+                                <button class="btn btn-outline-primary" id="prevBtn">Précédent</button>
+                                <button class="btn btn-primary" id="nextBtn" disabled>Soumettre ma demande</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 7: Confirmation -->
+                    <div class="step-content" id="step-confirmation">
+                        <div class="question-container">
+                            <div class="results-container">
+                                <div class="congratulations">
+                                    <i class="fas fa-check-circle"></i>
+                                    <h2>Demande soumise avec succès !</h2>
+                                    <p>Votre dossier a été créé et sera traité dans les plus brefs délais</p>
+                                </div>
+
+                                <div class="loan-result">
+                                    <div class="result-card">
+                                        <h3>Numéro de dossier</h3>
+                                        <div class="dossier-number" id="dossierNumber">NL-2024-000000</div>
+                                    </div>
+                                    
+                                    <div class="result-details">
+                                        <div class="detail-item">
+                                            <span class="label">Date de soumission :</span>
+                                            <span class="value" id="submissionDate">-</span>
+                                        </div>
+                                        <div class="detail-item">
+                                            <span class="label">Statut :</span>
+                                            <span class="value status-pending">En cours d'analyse</span>
+                                        </div>
+                                        <div class="detail-item">
+                                            <span class="label">Délai de traitement :</span>
+                                            <span class="value">5-7 jours ouvrés</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="next-steps">
+                                        <h4>Prochaines étapes :</h4>
+                                        <ul>
+                                            <li>Vérification de vos documents</li>
+                                            <li>Analyse de votre dossier</li>
+                                            <li>Retour par email sous 7 jours</li>
+                                        </ul>
+                                    </div>
+                                </div>
+
+                                <div class="navigation-buttons">
+                                    <button class="btn btn-outline-primary" onclick="window.location.href='/dashboard'">Mon tableau de bord</button>
+                                    <button class="btn btn-primary" onclick="window.location.href='/'">Retour à l'accueil</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/demande.js"></script>
+</body>
+</html>
